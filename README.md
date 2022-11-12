@@ -1,2 +1,2 @@
 # car-selling-app
-Car Selling App for End of Year Project
+Car selling app for end of year project
