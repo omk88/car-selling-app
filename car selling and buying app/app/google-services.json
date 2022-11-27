@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "267586076331",
+    "project_id": "car-buying-and-selling-app",
+    "storage_bucket": "car-buying-and-selling-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267586076331:android:4f279c78ebf5b76acb41ee",
+        "android_client_info": {
+          "package_name": "com.example.carsellingandbuyingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "267586076331-976din5sigpdf4thsomuffnch6nl9kt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOTWZdY48K6SV1oN6HygDqY0jdBDypMtg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "267586076331-976din5sigpdf4thsomuffnch6nl9kt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
