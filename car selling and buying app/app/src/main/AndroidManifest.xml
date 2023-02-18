@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -24,6 +26,15 @@
         <activity
             android:name=".register"
             android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".SellCar"
+            android:exported="false"
+            android:label="@string/title_activity_main_page"
+            android:theme="@style/Theme.CarSellingAndBuyingApp.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

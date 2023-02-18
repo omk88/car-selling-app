@@ -51,4 +51,5 @@ class MainActivity : AppCompatActivity() {
     fun switchToRegister(view: View) {
         startActivity(Intent(this@MainActivity,register::class.java))
     }
+
 }
