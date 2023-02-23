@@ -19,18 +19,20 @@ import javax.net.ssl.HttpsURLConnection
 import java.net.URLEncoder
 
 class SellCar2 : AppCompatActivity() {
+    lateinit var vehicleData: VehicleData
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sell_car2)
 
         CoroutineScope(Dispatchers.Main).launch {
-            fetchRegistrationData()
+            vehicleData = fetchRegistrationData()
         }
 
     }
 
 
-    private suspend fun fetchRegistrationData() {
+    private suspend fun fetchRegistrationData(): VehicleData {
         val gson = GsonBuilder().create()
 
         val retrofit = Retrofit.Builder()
@@ -46,12 +48,26 @@ class SellCar2 : AppCompatActivity() {
         val payload = mapOf("registrationNumber" to reg)
         val apiKey = "QKL4mvJLbR2dU32AL6oRo4GAl89EZhzQ5omO6aXF"
 
-        val vehicleData = service.getVehicleData(apiKey, payload)
-        val textView : TextView = findViewById<TextView>(R.id.textView3)
+        vehicleData = service.getVehicleData(apiKey, payload)
+        val textView : TextView = findViewById(R.id.textView3)
         textView.text = vehicleData.toString()
+
+        return vehicleData
+
     }
 
     fun switchToSellCar(view: View) {
         startActivity(Intent(this@SellCar2,SellCar::class.java))
+    }
+
+    fun switchToSellCar3(view: View) {
+        val intent = Intent(this, SellCar3::class.java)
+        intent.putExtra("registration", vehicleData.registrationNumber)
+        intent.putExtra("make", vehicleData.make)
+        intent.putExtra("colour", vehicleData.colour)
+        intent.putExtra("fuelType", vehicleData.fuelType)
+        intent.putExtra("registrationYear", vehicleData.registrationYear)
+        intent.putExtra("taxDueDate", vehicleData.taxDueDate)
+        startActivity(intent)
     }
 }

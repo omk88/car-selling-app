@@ -3,4 +3,76 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/upload0"
+        android:layout_width="113dp"
+        android:layout_height="116dp"
+        android:layout_marginEnd="16dp"
+        android:adjustViewBounds="true"
+        android:background="#6393C2D6"
+        android:backgroundTint="#0BACF4"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.115"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/upload1"
+        android:layout_width="113dp"
+        android:layout_height="116dp"
+        android:adjustViewBounds="true"
+        android:background="#6393C2D6"
+        android:backgroundTint="#0BACF4"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/upload0"
+        app:layout_constraintStart_toEndOf="@+id/upload2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.115"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/upload2"
+        android:layout_width="113dp"
+        android:layout_height="116dp"
+        android:layout_marginStart="16dp"
+        android:adjustViewBounds="true"
+        android:background="#6393C2D6"
+        android:backgroundTint="#0BACF4"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.115"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/postCar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post Car For Sale"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mileage"
+        app:layout_constraintVertical_bias="0.2" />
+
+    <EditText
+        android:id="@+id/mileage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Mileage"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
