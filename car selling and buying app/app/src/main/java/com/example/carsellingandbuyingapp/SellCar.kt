@@ -19,6 +19,7 @@ class SellCar : AppCompatActivity() {
         val intent = Intent(this, SellCar2::class.java)
         intent.putExtra("registration", regText.text.toString())
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
 
 

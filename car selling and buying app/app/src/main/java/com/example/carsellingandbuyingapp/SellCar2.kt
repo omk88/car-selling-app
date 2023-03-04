@@ -58,6 +58,7 @@ class SellCar2 : AppCompatActivity() {
 
     fun switchToSellCar(view: View) {
         startActivity(Intent(this@SellCar2,SellCar::class.java))
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
     }
 
     fun switchToSellCar3(view: View) {
@@ -69,5 +70,6 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("registrationYear", vehicleData.registrationYear)
         intent.putExtra("taxDueDate", vehicleData.taxDueDate)
         startActivity(intent)
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
 }
