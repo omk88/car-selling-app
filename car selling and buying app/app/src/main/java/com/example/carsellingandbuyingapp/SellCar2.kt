@@ -50,7 +50,10 @@ class SellCar2 : AppCompatActivity() {
 
         vehicleData = service.getVehicleData(apiKey, payload)
         val textView : TextView = findViewById(R.id.textView3)
-        textView.text = vehicleData.toString()
+
+        textView.text = "Registration: "+ vehicleData.registrationNumber +"\nMake: "+ vehicleData.make +
+                "\nColour: "+ vehicleData.colour + "\nFuel Type "+ vehicleData.fuelType +"\nRegistration Year: " +
+                vehicleData.registrationYear + "\nTax Due Date: "+ vehicleData.taxDueDate
 
         return vehicleData
 
@@ -62,6 +65,7 @@ class SellCar2 : AppCompatActivity() {
     }
 
     fun switchToSellCar3(view: View) {
+        val mileage = intent.getStringExtra("mileage").toString()
         val intent = Intent(this, SellCar3::class.java)
         intent.putExtra("registration", vehicleData.registrationNumber)
         intent.putExtra("make", vehicleData.make)
@@ -69,6 +73,7 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("fuelType", vehicleData.fuelType)
         intent.putExtra("registrationYear", vehicleData.registrationYear)
         intent.putExtra("taxDueDate", vehicleData.taxDueDate)
+        intent.putExtra("mileage", mileage)
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }

@@ -3,76 +3,91 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/sell_car_gradient">
 
-    <ImageView
-        android:id="@+id/upload0"
-        android:layout_width="113dp"
-        android:layout_height="116dp"
-        android:layout_marginEnd="16dp"
-        android:adjustViewBounds="true"
-        android:background="#6393C2D6"
-        android:backgroundTint="#0BACF4"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <TextView
+        android:id="@+id/textViewLogin4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="Upload a picture"
+        android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.115"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/upload1"
-        android:layout_width="113dp"
-        android:layout_height="116dp"
-        android:adjustViewBounds="true"
-        android:background="#6393C2D6"
-        android:backgroundTint="#0BACF4"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/upload0"
-        app:layout_constraintStart_toEndOf="@+id/upload2"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.115"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/upload2"
-        android:layout_width="113dp"
-        android:layout_height="116dp"
-        android:layout_marginStart="16dp"
-        android:adjustViewBounds="true"
-        android:background="#6393C2D6"
-        android:backgroundTint="#0BACF4"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.115"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/postCar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Post Car For Sale"
+        android:layout_width="280dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="128dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/poppins_regular"
+        android:onClick="switchToSellCar3"
+        android:text="Post Car"
+        android:textColor="#36454F"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mileage"
-        app:layout_constraintVertical_bias="0.2" />
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/mileage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Mileage"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewLogin4"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/upload1"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="-122dp"
+                tools:layout_editor_absoluteY="111dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+            <ImageView
+                android:id="@+id/upload2"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:baselineAligned="false"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="50dp"
+                tools:layout_editor_absoluteY="339dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+            <ImageView
+                android:id="@+id/upload0"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="238dp"
+                tools:layout_editor_absoluteY="111dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

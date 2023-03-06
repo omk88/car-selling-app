@@ -16,8 +16,10 @@ class SellCar : AppCompatActivity() {
 
     fun switchToSellCar2(view: View) {
         val regText = findViewById<EditText>(R.id.editTextCarRegistration)
+        val mileageText = findViewById<EditText>(R.id.editTextCarMileage)
         val intent = Intent(this, SellCar2::class.java)
         intent.putExtra("registration", regText.text.toString())
+        intent.putExtra("mileage", mileageText.text.toString())
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }

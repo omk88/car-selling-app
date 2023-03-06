@@ -48,6 +48,7 @@ class register : AppCompatActivity() {
 
         Toast.makeText(this, "Successfully Registered!", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this@register,MainActivity::class.java))
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
 
     }
 }

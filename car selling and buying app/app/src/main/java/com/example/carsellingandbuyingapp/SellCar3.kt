@@ -128,7 +128,6 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     private fun addCar() {
         val intent = intent
         val database = Firebase.database.getReference("cars")
-        val mileage = findViewById<EditText>(R.id.mileage)
 
         val registration = intent.getStringExtra("registration")
         val make = intent.getStringExtra("make")
@@ -136,8 +135,9 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         val fuelType = intent.getStringExtra("fuelType")
         val registrationYear = intent.getStringExtra("registrationYear")
         val taxDueDate = intent.getStringExtra("taxDueDate")
+        val mileage = intent.getStringExtra("mileage")
 
-        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.text.toString())
+        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString())
 
         database.child(registration.toString()).setValue(car)
 
