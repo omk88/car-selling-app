@@ -52,8 +52,9 @@ class SellCar2 : AppCompatActivity() {
         val textView : TextView = findViewById(R.id.textView3)
 
         textView.text = "Registration: "+ vehicleData.registrationNumber +"\nMake: "+ vehicleData.make +
-                "\nColour: "+ vehicleData.colour + "\nFuel Type "+ vehicleData.fuelType +"\nRegistration Year: " +
-                vehicleData.registrationYear + "\nTax Due Date: "+ vehicleData.taxDueDate
+                "\nColour: "+ vehicleData.colour + "\nFuel Type "+ vehicleData.fuelType +
+                "\nTax Due Date: "+ vehicleData.taxDueDate + "\nYear Of Manufacture: " +
+                vehicleData.yearOfManufacture
 
         return vehicleData
 
@@ -74,6 +75,7 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("registrationYear", vehicleData.registrationYear)
         intent.putExtra("taxDueDate", vehicleData.taxDueDate)
         intent.putExtra("mileage", mileage)
+        intent.putExtra("yearOfManufacture", vehicleData.yearOfManufacture)
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }

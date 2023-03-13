@@ -6,5 +6,6 @@ data class VehicleData(
     val colour: String,
     val fuelType: String,
     val registrationYear: String,
-    val taxDueDate: String
+    val taxDueDate: String,
+    val yearOfManufacture: String
 )

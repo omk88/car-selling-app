@@ -112,8 +112,11 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         for (i in 0..2) {
             uris[i]?.let {
                 images[i].putFile(it).addOnSuccessListener {
-                    pd.dismiss()
-                    Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                    if(i == 2) {
+                        startActivity(Intent(this@SellCar3,MainPage::class.java))
+                        pd.dismiss()
+                        Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }?.addOnFailureListener {
                 pd.dismiss()
@@ -136,12 +139,10 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         val registrationYear = intent.getStringExtra("registrationYear")
         val taxDueDate = intent.getStringExtra("taxDueDate")
         val mileage = intent.getStringExtra("mileage")
+        val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
 
-        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString())
-
+        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture)
         database.child(registration.toString()).setValue(car)
-
-        startActivity(Intent(this@SellCar3,MainPage::class.java))
     }
 }
 
