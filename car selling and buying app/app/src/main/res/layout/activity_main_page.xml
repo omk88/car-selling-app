@@ -18,8 +18,8 @@
 
     <ListView
         android:id="@+id/carList"
-        android:layout_width="415dp"
-        android:layout_height="683dp"
+        android:layout_width="363dp"
+        android:layout_height="676dp"
         app:layout_constraintBottom_toTopOf="@+id/button5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

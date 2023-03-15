@@ -5,16 +5,108 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/callSeller"
+        android:layout_width="280dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/poppins_regular"
+        android:onClick="switchToSellCar3"
+        android:text="Call Seller"
+        android:textColor="#36454F"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/textView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.15">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/image1"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="-122dp"
+                tools:layout_editor_absoluteY="111dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+            <ImageView
+                android:id="@+id/image2"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:baselineAligned="false"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="50dp"
+                tools:layout_editor_absoluteY="339dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+            <ImageView
+                android:id="@+id/image0"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:adjustViewBounds="true"
+                android:background="#6393C2D6"
+                android:backgroundTint="#0BACF4"
+                android:scaleType="fitXY"
+                tools:layout_editor_absoluteX="238dp"
+                tools:layout_editor_absoluteY="111dp"
+                tools:srcCompat="@drawable/selectimage" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="413dp"
-        android:layout_height="159dp"
-        android:paddingLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:fontFamily="@font/poppins_regular"
+        android:paddingLeft="20dp"
+        android:text="TextView"
+        android:textSize="23dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.59" />
+
+    <TextView
+        android:id="@+id/priceText"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:fontFamily="@font/poppins_regular"
+        android:paddingLeft="20dp"
         android:text="TextView"
         android:textSize="23dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.051"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.625" />
+        app:layout_constraintVertical_bias="0.645" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,16 +27,45 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
 
         val item = items[position]
         Glide.with(context)
-            .load(item.imageUrl)
+            .load(item.image2Url)
             .into(viewHolder.imageView)
-        viewHolder.textView.text = item.text
+        viewHolder.textView1.text = item.text1
+        viewHolder.textView2.text = item.text2
+        viewHolder.textView3.text = item.text3
+        viewHolder.textView4.text = item.text4
+        viewHolder.textView5.text = item.text5
+
+        Glide.with(context)
+            .load(item.image1Url)
+            .into(viewHolder.imageView2)
+        viewHolder.textView1.text = item.text1
+        viewHolder.textView2.text = item.text2
+        viewHolder.textView3.text = item.text3
+        viewHolder.textView4.text = item.text4
+        viewHolder.textView5.text = item.text5
+
+        Glide.with(context)
+            .load(item.image0Url)
+            .into(viewHolder.imageView3)
+        viewHolder.textView1.text = item.text1
+        viewHolder.textView2.text = item.text2
+        viewHolder.textView3.text = item.text3
+        viewHolder.textView4.text = item.text4
+        viewHolder.textView5.text = item.text5
 
         return view
     }
 
     private class ViewHolder(view: View) {
         val imageView: ImageView = view.findViewById(R.id.imageView)
-        val textView: TextView = view.findViewById(R.id.textView)
+        val imageView2: ImageView = view.findViewById(R.id.imageView2)
+        val imageView3: ImageView = view.findViewById(R.id.imageView3)
+        val textView1: TextView = view.findViewById(R.id.textView1)
+        val textView2: TextView = view.findViewById(R.id.textView2)
+        val textView3: TextView = view.findViewById(R.id.textView3)
+        val textView4: TextView = view.findViewById(R.id.textView4)
+        val textView5: TextView = view.findViewById(R.id.textView5)
+
     }
 
 

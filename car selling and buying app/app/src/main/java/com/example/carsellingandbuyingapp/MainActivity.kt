@@ -42,7 +42,10 @@ class MainActivity : AppCompatActivity() {
                 if(password == it.child("password").value) {
                     val password = it.child("password").value
                     Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@MainActivity,MainPage::class.java))
+                    val intent = Intent(this, MainPage::class.java)
+                    intent.putExtra("username",it.child("username").value.toString())
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                 } else {
                     Toast.makeText(this, "Password Incorrect", Toast.LENGTH_SHORT).show()
                 }

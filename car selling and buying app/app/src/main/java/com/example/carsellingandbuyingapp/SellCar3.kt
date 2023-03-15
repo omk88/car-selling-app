@@ -140,8 +140,11 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         val taxDueDate = intent.getStringExtra("taxDueDate")
         val mileage = intent.getStringExtra("mileage")
         val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
+        val price = intent.getStringExtra("price")
+        val model = intent.getStringExtra("model")
+        val username = intent.getStringExtra("username")
 
-        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture)
+        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username)
         database.child(registration.toString()).setValue(car)
     }
 }

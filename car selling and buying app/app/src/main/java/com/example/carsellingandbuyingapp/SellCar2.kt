@@ -67,6 +67,10 @@ class SellCar2 : AppCompatActivity() {
 
     fun switchToSellCar3(view: View) {
         val mileage = intent.getStringExtra("mileage").toString()
+        val model = intent.getStringExtra("model").toString()
+        val price = intent.getStringExtra("price").toString()
+        val username = intent.getStringExtra("username").toString()
+
         val intent = Intent(this, SellCar3::class.java)
         intent.putExtra("registration", vehicleData.registrationNumber)
         intent.putExtra("make", vehicleData.make)
@@ -76,6 +80,9 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("taxDueDate", vehicleData.taxDueDate)
         intent.putExtra("mileage", mileage)
         intent.putExtra("yearOfManufacture", vehicleData.yearOfManufacture)
+        intent.putExtra("model", model)
+        intent.putExtra("price", price)
+        intent.putExtra("username", username)
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }
