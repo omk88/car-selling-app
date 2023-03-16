@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile"/>
+    <item
+        android:id="@+id/map"
+        android:icon="@drawable/ic_map"
+        android:title="Map"/>
+    <item
+        android:id="@+id/browse"
+        android:icon="@drawable/ic_browse_cars"
+        android:title="Browse Cars"/>
+    <item
+        android:id="@+id/sellCar"
+        android:icon="@drawable/ic_sell"
+        android:title="Sell Car"/>
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="Settings"/>
+
+</menu>

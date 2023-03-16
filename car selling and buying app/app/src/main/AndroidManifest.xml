@@ -68,6 +68,15 @@
                 android:value="" />
         </activity>
         <activity
+            android:name=".MapsPage"
+            android:exported="false"
+            android:label="@string/title_activity_main_page"
+            android:theme="@style/Theme.CarSellingAndBuyingApp.NoActionBar">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -80,6 +89,27 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name=".Profile"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBCTCIpS4t1m9HgmCuUowaoxKSa7vJQShw" />
+        <activity
+            android:name="com.google.android.libraries.places.widget.AutocompleteActivity"
+            android:theme="@style/AutocompleteTheme"
+            tools:replace="android:theme" />
+
     </application>
 
 </manifest>

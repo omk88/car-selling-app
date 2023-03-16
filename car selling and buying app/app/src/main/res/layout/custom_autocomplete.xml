@@ -1,0 +1,30 @@
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/custom_autocomplete_include"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/custom_autocomplete_edit_text"
+        android:layout_width="280dp"
+        android:layout_height="45dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/edit_text_background"
+        android:ems="10"
+        android:fontFamily="@font/poppins_regular"
+        android:hint="Address"
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingLeft="15dp"
+        android:paddingTop="7.5dp"
+        android:paddingBottom="5.5dp"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.519"
+        app:layout_constraintStart_toStartOf="parent"
+        android:focusable="false"/>
+</merge>

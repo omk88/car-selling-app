@@ -113,9 +113,19 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
             uris[i]?.let {
                 images[i].putFile(it).addOnSuccessListener {
                     if(i == 2) {
-                        startActivity(Intent(this@SellCar3,MainPage::class.java))
-                        pd.dismiss()
-                        Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                        val database = Firebase.database.getReference("users")
+                        database.child(intent.getStringExtra("username").toString()).get().addOnSuccessListener {
+                            if(it.exists()) {
+                                val address = it.child("address").toString()
+                                val intent = Intent(this, MainPage::class.java)
+                                intent.putExtra("address", address)
+                                startActivity(intent)
+                                overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+                                pd.dismiss()
+                                Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
                     }
                 }
             }?.addOnFailureListener {
@@ -129,23 +139,29 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun addCar() {
-        val intent = intent
-        val database = Firebase.database.getReference("cars")
+        val databaseUsers = Firebase.database.getReference("users")
+        databaseUsers.child(intent.getStringExtra("username").toString()).get().addOnSuccessListener {
+            if(it.exists()) {
+                val address = it.child("address").value.toString()
+                val intent = intent
+                val databaseCars = Firebase.database.getReference("cars")
 
-        val registration = intent.getStringExtra("registration")
-        val make = intent.getStringExtra("make")
-        val colour = intent.getStringExtra("colour")
-        val fuelType = intent.getStringExtra("fuelType")
-        val registrationYear = intent.getStringExtra("registrationYear")
-        val taxDueDate = intent.getStringExtra("taxDueDate")
-        val mileage = intent.getStringExtra("mileage")
-        val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
-        val price = intent.getStringExtra("price")
-        val model = intent.getStringExtra("model")
-        val username = intent.getStringExtra("username")
+                val registration = intent.getStringExtra("registration")
+                val make = intent.getStringExtra("make")
+                val colour = intent.getStringExtra("colour")
+                val fuelType = intent.getStringExtra("fuelType")
+                val registrationYear = intent.getStringExtra("registrationYear")
+                val taxDueDate = intent.getStringExtra("taxDueDate")
+                val mileage = intent.getStringExtra("mileage")
+                val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
+                val price = intent.getStringExtra("price")
+                val model = intent.getStringExtra("model")
+                val username = intent.getStringExtra("username")
 
-        val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username)
-        database.child(registration.toString()).setValue(car)
+                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address)
+                databaseCars.child(registration.toString()).setValue(car)
+            }
+        }
     }
 }
 
