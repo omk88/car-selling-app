@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.Window
-import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -42,6 +39,8 @@ class MainActivity : AppCompatActivity() {
                 if(password == it.child("password").value) {
                     val password = it.child("password").value
                     Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
+                    val loggedInUser = application as Username
+                    loggedInUser.username = it.child("username").value.toString()
                     val intent = Intent(this, MainPage::class.java)
                     intent.putExtra("username",it.child("username").value.toString())
                     startActivity(intent)
@@ -59,9 +58,4 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
-    fun switchToRegister(view: View) {
-        startActivity(Intent(this@MainActivity,register::class.java))
-    }
-
 }

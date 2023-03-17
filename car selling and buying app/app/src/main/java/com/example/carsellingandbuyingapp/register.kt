@@ -40,7 +40,7 @@ class register : AppCompatActivity() {
         customAutocompleteEditText.setOnClickListener {
             val intent = Autocomplete.IntentBuilder(
                 AutocompleteActivityMode.FULLSCREEN,
-                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS) 
+                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
             )
                 .setTypeFilter(TypeFilter.ADDRESS)
                 .setCountry("GB")

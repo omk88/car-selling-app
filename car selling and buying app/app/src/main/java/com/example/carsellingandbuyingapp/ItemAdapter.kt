@@ -34,6 +34,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView3.text = item.text3
         viewHolder.textView4.text = item.text4
         viewHolder.textView5.text = item.text5
+        viewHolder.textView6.text = item.text6
+        viewHolder.textView7.text = item.text7
 
         Glide.with(context)
             .load(item.image1Url)
@@ -43,6 +45,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView3.text = item.text3
         viewHolder.textView4.text = item.text4
         viewHolder.textView5.text = item.text5
+        viewHolder.textView6.text = item.text6
+        viewHolder.textView7.text = item.text7
 
         Glide.with(context)
             .load(item.image0Url)
@@ -52,6 +56,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView3.text = item.text3
         viewHolder.textView4.text = item.text4
         viewHolder.textView5.text = item.text5
+        viewHolder.textView6.text = item.text6
+        viewHolder.textView7.text = item.text7
 
         return view
     }
@@ -65,6 +71,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         val textView3: TextView = view.findViewById(R.id.textView3)
         val textView4: TextView = view.findViewById(R.id.textView4)
         val textView5: TextView = view.findViewById(R.id.textView5)
+        val textView6: TextView = view.findViewById(R.id.textView6)
+        val textView7: TextView = view.findViewById(R.id.reg)
 
     }
 

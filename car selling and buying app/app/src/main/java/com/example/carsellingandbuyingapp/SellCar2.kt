@@ -8,15 +8,16 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.InputStreamReader
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 import java.net.URLEncoder
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+
 
 class SellCar2 : AppCompatActivity() {
     lateinit var vehicleData: VehicleData
@@ -26,13 +27,22 @@ class SellCar2 : AppCompatActivity() {
         setContentView(R.layout.activity_sell_car2)
 
         CoroutineScope(Dispatchers.Main).launch {
-            vehicleData = fetchRegistrationData()
+            vehicleData = fetchRegistrationData().await()
+            updateTextView(vehicleData)
         }
+    }
 
+    private fun updateTextView(vehicleData: VehicleData) {
+        val textView: TextView = findViewById(R.id.textView3)
+
+        textView.text = "Registration: " + vehicleData.registrationNumber + "\nMake: " + vehicleData.make +
+                "\nColour: " + vehicleData.colour + "\nFuel Type " + vehicleData.fuelType +
+                "\nTax Due Date: " + vehicleData.taxDueDate + "\nYear Of Manufacture: " +
+                vehicleData.yearOfManufacture
     }
 
 
-    private suspend fun fetchRegistrationData(): VehicleData {
+    private suspend fun fetchRegistrationData(): Deferred<VehicleData> = coroutineScope {
         val gson = GsonBuilder().create()
 
         val retrofit = Retrofit.Builder()
@@ -48,16 +58,8 @@ class SellCar2 : AppCompatActivity() {
         val payload = mapOf("registrationNumber" to reg)
         val apiKey = "QKL4mvJLbR2dU32AL6oRo4GAl89EZhzQ5omO6aXF"
 
-        vehicleData = service.getVehicleData(apiKey, payload)
-        val textView : TextView = findViewById(R.id.textView3)
-
-        textView.text = "Registration: "+ vehicleData.registrationNumber +"\nMake: "+ vehicleData.make +
-                "\nColour: "+ vehicleData.colour + "\nFuel Type "+ vehicleData.fuelType +
-                "\nTax Due Date: "+ vehicleData.taxDueDate + "\nYear Of Manufacture: " +
-                vehicleData.yearOfManufacture
-
-        return vehicleData
-
+        val vehicleDataDeferred = async { service.getVehicleData(apiKey, payload) }
+        vehicleDataDeferred
     }
 
     fun switchToSellCar(view: View) {
@@ -70,6 +72,7 @@ class SellCar2 : AppCompatActivity() {
         val model = intent.getStringExtra("model").toString()
         val price = intent.getStringExtra("price").toString()
         val username = intent.getStringExtra("username").toString()
+        val condition = intent.getStringExtra("condition").toString()
 
         val intent = Intent(this, SellCar3::class.java)
         intent.putExtra("registration", vehicleData.registrationNumber)
@@ -83,6 +86,7 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("model", model)
         intent.putExtra("price", price)
         intent.putExtra("username", username)
+        intent.putExtra("condition", condition)
         startActivity(intent)
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
     }

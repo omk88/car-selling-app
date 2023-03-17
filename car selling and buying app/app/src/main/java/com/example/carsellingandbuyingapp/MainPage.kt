@@ -27,11 +27,12 @@ class MainPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
 
+        val username = intent.getStringExtra("username")
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.profile -> {
-                    val username = intent.getStringExtra("username")
                     val intent = Intent(this@MainPage, Profile::class.java)
                     intent.putExtra("username", username)
                     startActivity(intent)
@@ -47,7 +48,6 @@ class MainPage : AppCompatActivity() {
                     true
                 }
                 R.id.sellCar -> {
-                    val username = intent.getStringExtra("username")
                     val intent = Intent(this@MainPage, SellCar::class.java)
                     intent.putExtra("username", username)
                     startActivity(intent)
@@ -67,18 +67,7 @@ class MainPage : AppCompatActivity() {
 
         mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val clickedCardView = view.findViewById<CardView>(R.id.cardView)
-            var text = clickedCardView.findViewById<TextView>(R.id.textView).text.toString()
-
-            text = text.substring(1, text.length - 1)
-            val aList = text.split(",")
-
-            var registration = ""
-            for (i in 1 until aList.size - 1) {
-                if (aList[i].contains("registration")) {
-                    registration = aList[i].split("=")[1]
-                    break
-                }
-            }
+            var registration = clickedCardView.findViewById<TextView>(R.id.reg).text.toString()
 
             val intent = Intent(this@MainPage, CarSalePage::class.java)
             intent.putExtra("carData", registration)
@@ -91,7 +80,6 @@ class MainPage : AppCompatActivity() {
             override fun onChildAdded(
                 snapshot: DataSnapshot, @Nullable previousChildName: String?
             ) {
-                println(snapshot)
                 val registration = snapshot.child("registration").getValue().toString()
                 val make = snapshot.child("make").getValue().toString()
                 val colour = snapshot.child("colour").getValue().toString()
@@ -99,7 +87,15 @@ class MainPage : AppCompatActivity() {
                 val yearOfManufacture = snapshot.child("yearOfManufacture").getValue().toString()
                 val price = snapshot.child("price").getValue().toString()
                 val model = snapshot.child("model").getValue().toString()
-                val address = snapshot.child("address")
+                val condition = snapshot.child("condition").getValue().toString()
+
+                val regex = Regex(",\\s*([a-zA-Z]+)\\s*[a-zA-Z]*\\s*\\d")
+                val matchResult = regex.find(snapshot.child("address").getValue().toString())
+                var address = "Unknown"
+
+                if (matchResult != null) {
+                    address = matchResult.groups[1]?.value.toString()
+                }
 
                 val storageRef = Firebase.storage.reference
                 val image0Ref = storageRef.child("images/image0-" + registration)
@@ -120,7 +116,9 @@ class MainPage : AppCompatActivity() {
                                 make+" "+model,
                                 yearOfManufacture,
                                 mileage,
-                                address)
+                                address,
+                                condition,
+                                registration)
 
                             cars.add(item)
                             adapter.notifyDataSetChanged()

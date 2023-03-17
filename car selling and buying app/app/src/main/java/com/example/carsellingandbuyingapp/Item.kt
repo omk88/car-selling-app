@@ -7,4 +7,6 @@ data class Item(val image2Url: String,
                 val text2: String,
                 val text3: String,
                 val text4: String,
-                val text5: String)
+                val text5: String,
+                val text6: String,
+                val text7: String)

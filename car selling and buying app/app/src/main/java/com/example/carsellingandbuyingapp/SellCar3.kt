@@ -8,17 +8,11 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.OnProgressListener
-import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
-import java.util.*
 
 class SellCar3 : AppCompatActivity(), View.OnClickListener {
 
@@ -97,6 +91,7 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     private fun uploadImage() {
         val intent = intent
         val registration = intent.getStringExtra("registration")
+        println("REG"+intent.getStringExtra("registration"))
         var storageRef = Firebase.storage.reference
         var pd = ProgressDialog(this@SellCar3)
         pd.setTitle("Posting Car...")
@@ -113,9 +108,12 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
             uris[i]?.let {
                 images[i].putFile(it).addOnSuccessListener {
                     if(i == 2) {
+                        val loggedInUser = application as Username
+                        val user = loggedInUser.username
                         val database = Firebase.database.getReference("users")
-                        database.child(intent.getStringExtra("username").toString()).get().addOnSuccessListener {
+                        database.child(user).get().addOnSuccessListener {
                             if(it.exists()) {
+                                println("EXISTS")
                                 val address = it.child("address").toString()
                                 val intent = Intent(this, MainPage::class.java)
                                 intent.putExtra("address", address)
@@ -139,10 +137,15 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun addCar() {
+        println("AAAAAAAAAAAAA1")
         val databaseUsers = Firebase.database.getReference("users")
-        databaseUsers.child(intent.getStringExtra("username").toString()).get().addOnSuccessListener {
+        val loggedInUser = application as Username
+        val user = loggedInUser.username
+        databaseUsers.child(user).get().addOnSuccessListener {
+            println("AAAAAAAAAAAAA2"+loggedInUser.username)
             if(it.exists()) {
                 val address = it.child("address").value.toString()
+                println("ADDRESS"+address)
                 val intent = intent
                 val databaseCars = Firebase.database.getReference("cars")
 
@@ -156,12 +159,13 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
                 val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
                 val price = intent.getStringExtra("price")
                 val model = intent.getStringExtra("model")
-                val username = intent.getStringExtra("username")
+                val username = user
+                val condition = intent.getStringExtra("condition")
 
-                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address)
-                databaseCars.child(registration.toString()).setValue(car)
+                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address, condition)
+                databaseCars.child(registration.toString()).setValue(car).addOnSuccessListener { println("DONE!!") }.addOnFailureListener { println("FAILED :(") }
             }
-        }
+        }.addOnFailureListener{println("FAILLLLLLLLL")}
     }
 }
 

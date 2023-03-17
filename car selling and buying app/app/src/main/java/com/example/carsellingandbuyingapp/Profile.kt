@@ -17,7 +17,7 @@ class Profile : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val database = Firebase.database.getReference("cars")
-        val cars = mutableListOf(Item("", "", "", "text1", "text2", "text3", "text4","text5"))
+        val cars = mutableListOf(Item("", "", "", "text1", "text2", "text3", "text4","text5", "", ""))
 
         var mListView = findViewById<ListView>(R.id.carList)
         val adapter = ItemAdapter(this, cars)
@@ -54,7 +54,9 @@ class Profile : AppCompatActivity() {
                                 colour,
                                 yearOfManufacture,
                                 mileage,
-                                price)
+                                price,
+                                "",
+                            "")
                             val username = intent.getStringExtra("username")
                             if(username == snapshot.child("seller").getValue().toString())
                             {
