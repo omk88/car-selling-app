@@ -12,4 +12,6 @@ data class Car(val registration: String? = null,
                val model: String? = null,
                val seller: String? = null,
                val address: String? = null,
-               val condition: String? = null)
+               val condition: String? = null,
+               val co2Emissions: String? = null,
+               val engineCapacity: String? = null)

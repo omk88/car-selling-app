@@ -159,10 +159,12 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
                 val yearOfManufacture = intent.getStringExtra("yearOfManufacture")
                 val price = intent.getStringExtra("price")
                 val model = intent.getStringExtra("model")
+                val co2Emissions = intent.getStringExtra("co2Emissions")
+                val engineCapacity = intent.getStringExtra("engineCapacity")
                 val username = user
                 val condition = intent.getStringExtra("condition")
 
-                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address, condition)
+                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address, condition, co2Emissions, engineCapacity)
                 databaseCars.child(registration.toString()).setValue(car).addOnSuccessListener { println("DONE!!") }.addOnFailureListener { println("FAILED :(") }
             }
         }.addOnFailureListener{println("FAILLLLLLLLL")}

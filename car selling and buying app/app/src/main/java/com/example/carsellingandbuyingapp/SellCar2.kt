@@ -60,6 +60,7 @@ class SellCar2 : AppCompatActivity() {
 
         val vehicleDataDeferred = async { service.getVehicleData(apiKey, payload) }
         vehicleDataDeferred
+
     }
 
     fun switchToSellCar(view: View) {
@@ -83,6 +84,8 @@ class SellCar2 : AppCompatActivity() {
         intent.putExtra("taxDueDate", vehicleData.taxDueDate)
         intent.putExtra("mileage", mileage)
         intent.putExtra("yearOfManufacture", vehicleData.yearOfManufacture)
+        intent.putExtra("co2Emissions", vehicleData.co2Emissions)
+        intent.putExtra("engineCapacity", vehicleData.engineCapacity)
         intent.putExtra("model", model)
         intent.putExtra("price", price)
         intent.putExtra("username", username)

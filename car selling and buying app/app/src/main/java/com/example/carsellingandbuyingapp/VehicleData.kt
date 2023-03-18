@@ -7,5 +7,7 @@ data class VehicleData(
     val fuelType: String,
     val registrationYear: String,
     val taxDueDate: String,
-    val yearOfManufacture: String
+    val yearOfManufacture: String,
+    val co2Emissions: String,
+    val engineCapacity: String
 )
