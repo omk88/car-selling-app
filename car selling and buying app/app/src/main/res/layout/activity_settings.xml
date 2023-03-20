@@ -1,162 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="#E7E7E7">
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center_horizontal">
-
-        <ImageView
-            android:id="@+id/imageView5"
-            android:layout_width="129dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_person" />
-
-        <TextView
-            android:id="@+id/textViewLogin6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/poppins_regular"
-            android:text="Profile"
-            android:textSize="27sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/editTextTextPersonName4"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:fontFamily="@font/poppins_regular"
-            android:hint="Username"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingTop="7.5dp"
-            android:paddingBottom="5.5dp"
-            android:textCursorDrawable="@drawable/cursor_color"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword5"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/editTextTextPassword4"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:fontFamily="@font/poppins_regular"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingTop="7.5dp"
-            android:paddingBottom="5.5dp"
-            android:textCursorDrawable="@drawable/cursor_color"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextPhoneNumber2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/editTextTextPassword5"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:fontFamily="@font/poppins_regular"
-            android:hint="Confirm Password"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingTop="7.5dp"
-            android:paddingBottom="5.5dp"
-            android:textCursorDrawable="@drawable/cursor_color"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword4"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <EditText
-            android:id="@+id/editTextPhoneNumber2"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:fontFamily="@font/poppins_regular"
-            android:hint="Phone Number"
-            android:inputType="phone"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingTop="7.5dp"
-            android:paddingBottom="5.5dp"
-            android:textCursorDrawable="@drawable/cursor_color"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/container"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.519"
-            app:layout_constraintStart_toStartOf="parent" />
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginTop="64dp"
+        android:padding="20dp"
+        app:cardBackgroundColor="#f5f7fa"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:foregroundGravity="center_vertical"
-            app:layout_constraintBottom_toTopOf="@+id/textViewLogin7"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.519"
-            app:layout_constraintStart_toStartOf="parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center_horizontal">
 
-            <include
-                android:id="@+id/custom_autocomplete_include"
-                layout="@layout/custom_autocomplete"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="129dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_person" />
 
+                <TextView
+                    android:id="@+id/textViewLogin6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="Profile"
+                    android:textSize="27sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonName4"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:textColor="#A3A3A3"/>
 
+                <EditText
+                    android:id="@+id/editTextTextPersonName4"
+                    android:layout_width="280dp"
+                    android:layout_height="45dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/edit_text_background"
+                    android:ems="10"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="Username"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="7.5dp"
+                    android:paddingBottom="5.5dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.496"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:textColorHint="#A3A3A3"
+                    android:textColor="#A3A3A3"/>
+
+                <EditText
+                    android:id="@+id/editTextTextPassword4"
+                    android:layout_width="280dp"
+                    android:layout_height="45dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/edit_text_background"
+                    android:ems="10"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="7.5dp"
+                    android:paddingBottom="5.5dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextPhoneNumber2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.496"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:textColorHint="#A3A3A3"
+                    android:textColor="#A3A3A3"/>
+
+                <EditText
+                    android:textColorHint="#A3A3A3"
+                    android:textColor="#A3A3A3"
+                    android:id="@+id/editTextTextPassword5"
+                    android:layout_width="280dp"
+                    android:layout_height="45dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/edit_text_background"
+                    android:ems="10"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="Confirm Password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="7.5dp"
+                    android:paddingBottom="5.5dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword4"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.496"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <EditText
+                    android:id="@+id/editTextPhoneNumber2"
+                    android:layout_width="280dp"
+                    android:layout_height="45dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/edit_text_background"
+                    android:ems="10"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="Phone Number"
+                    android:inputType="phone"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="7.5dp"
+                    android:paddingBottom="5.5dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toTopOf="@+id/container"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.519"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:textColorHint="#A3A3A3"
+                    android:textColor="#A3A3A3"/>
+
+                <LinearLayout
+
+                    android:id="@+id/container"
+                    android:layout_width="280dp"
+                    android:layout_height="45dp"
+                    android:layout_marginBottom="16dp"
+                    android:foregroundGravity="center_vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/textViewLogin7"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.519"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <include
+                        android:id="@+id/custom_autocomplete_include"
+                        layout="@layout/custom_autocomplete_profile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button2"
+                android:layout_width="280dp"
+                android:layout_height="45dp"
+                android:layout_marginBottom="140dp"
+                android:background="@drawable/button_background"
+                android:fontFamily="@font/poppins_regular"
+                android:onClick="checkData"
+                android:text="Update Details"
+                android:textColor="#36454F"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.519"
+                app:layout_constraintStart_toStartOf="parent" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textViewLogin7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_regular"
-            android:text="Selling"
-            android:textSize="27sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="507dp" />
-
-        <ListView
-            android:id="@+id/carList"
-            android:layout_width="350dp"
-            android:layout_height="614dp"
-            app:layout_constraintBottom_toTopOf="@+id/navBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </ScrollView>
