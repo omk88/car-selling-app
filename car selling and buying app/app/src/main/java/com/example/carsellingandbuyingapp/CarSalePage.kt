@@ -20,7 +20,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.*
 import java.io.IOException
 
 class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
@@ -49,6 +48,14 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
         val price = findViewById<TextView>(R.id.priceText)
         val co2EmissionsText = findViewById<TextView>(R.id.co2Text)
         val engineCapacity = findViewById<TextView>(R.id.engineText)
+
+        userText.setOnClickListener{
+            val username = userText.text.toString()
+            val intent = Intent(this@CarSalePage, Profile::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+        }
 
 
         val registration = intent.getStringExtra("carData").toString()
@@ -101,6 +108,7 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
         database.child(registration).get().addOnSuccessListener {
             if(it.exists()) {
                 address = it.child("address").value.toString()
+                val condition = it.child("condition").value.toString()
                 price.setText(it.child("price").value.toString())
                 registrationText.setText(it.child("registration").value.toString())
                 mileageText.setText(it.child("mileage").value.toString())
@@ -109,6 +117,7 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
                 colourText.setText(it.child("colour").value.toString().lowercase().capitalize())
                 co2EmissionsText.setText(it.child("co2Emissions").value.toString())
                 engineCapacity.setText(it.child("engineCapacity").value.toString())
+
                 if(it.child("make").value.toString().split(" ").size == 2) {
                     textView.setText(
                         it.child("make").value.toString().split(" ")[0].lowercase()
@@ -123,7 +132,6 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-
     }
 
     private fun addMarkerForAddress(address: String, latLng: LatLng) {

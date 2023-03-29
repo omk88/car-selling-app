@@ -60,7 +60,6 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
                 addCar()
             }
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -91,7 +90,6 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     private fun uploadImage() {
         val intent = intent
         val registration = intent.getStringExtra("registration")
-        println("REG"+intent.getStringExtra("registration"))
         var storageRef = Firebase.storage.reference
         var pd = ProgressDialog(this@SellCar3)
         pd.setTitle("Posting Car...")
@@ -137,12 +135,10 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun addCar() {
-        println("AAAAAAAAAAAAA1")
         val databaseUsers = Firebase.database.getReference("users")
         val loggedInUser = application as Username
         val user = loggedInUser.username
         databaseUsers.child(user).get().addOnSuccessListener {
-            println("AAAAAAAAAAAAA2"+loggedInUser.username)
             if(it.exists()) {
                 val address = it.child("address").value.toString()
                 println("ADDRESS"+address)
@@ -164,10 +160,10 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
                 val username = user
                 val condition = intent.getStringExtra("condition")
 
-                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, username, address, condition, co2Emissions, engineCapacity)
+                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, user, address, condition, co2Emissions, engineCapacity)
                 databaseCars.child(registration.toString()).setValue(car).addOnSuccessListener { println("DONE!!") }.addOnFailureListener { println("FAILED :(") }
             }
-        }.addOnFailureListener{println("FAILLLLLLLLL")}
+        }.addOnFailureListener{}
     }
 }
 

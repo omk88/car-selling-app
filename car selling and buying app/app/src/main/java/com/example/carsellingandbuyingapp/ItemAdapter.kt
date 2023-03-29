@@ -36,6 +36,7 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView5.text = item.text5
         viewHolder.textView6.text = item.text6
         viewHolder.textView7.text = item.text7
+        viewHolder.removeButton.visibility = View.INVISIBLE
 
         Glide.with(context)
             .load(item.image1Url)
@@ -47,6 +48,7 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView5.text = item.text5
         viewHolder.textView6.text = item.text6
         viewHolder.textView7.text = item.text7
+        viewHolder.removeButton.visibility = View.INVISIBLE
 
         Glide.with(context)
             .load(item.image0Url)
@@ -58,6 +60,7 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView5.text = item.text5
         viewHolder.textView6.text = item.text6
         viewHolder.textView7.text = item.text7
+        viewHolder.removeButton.visibility = View.INVISIBLE
 
         return view
     }
@@ -73,6 +76,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         val textView5: TextView = view.findViewById(R.id.textView5)
         val textView6: TextView = view.findViewById(R.id.textView6)
         val textView7: TextView = view.findViewById(R.id.reg)
+
+        val removeButton = view.findViewById<ImageView>(R.id.removeButton)
 
     }
 

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +27,8 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.ByteArrayOutputStream
 
 class register : AppCompatActivity() {
     private val AUTOCOMPLETE_REQUEST_CODE = 1
@@ -98,6 +102,30 @@ class register : AppCompatActivity() {
         Toast.makeText(this, "Successfully Registered!", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this@register,MainActivity::class.java))
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+
+
+        var storageRef = Firebase.storage.reference
+
+        val bannerBitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.banner)
+        val profileBitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.profile_picture)
+
+        val bannerByteArray = ByteArrayOutputStream()
+        bannerBitmap.compress(Bitmap.CompressFormat.PNG, 100, bannerByteArray)
+
+        val profileByteArray = ByteArrayOutputStream()
+        profileBitmap.compress(Bitmap.CompressFormat.PNG, 100, profileByteArray)
+
+        val bannerRef = storageRef.child("images/banner-$username")
+        val bannerUploadTask = bannerRef.putBytes(bannerByteArray.toByteArray())
+
+        val profileRef = storageRef.child("images/profile_picture-$username")
+        val profileUploadTask = profileRef.putBytes(profileByteArray.toByteArray())
+
+        bannerUploadTask.addOnSuccessListener { /* handle success */ }
+            .addOnFailureListener { /* handle failure */ }
+
+        profileUploadTask.addOnSuccessListener { /* handle success */ }
+            .addOnFailureListener { /* handle failure */ }
 
     }
 }
