@@ -1,18 +1,28 @@
 package com.example.carsellingandbuyingapp
 
+import android.app.Activity
 import android.app.ProgressDialog
+import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.TypeFilter
+import com.google.android.libraries.places.widget.Autocomplete
+import com.google.android.libraries.places.widget.AutocompleteActivity
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -23,6 +33,7 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
     private var bannerUri: Uri? = null
     private var profilePictureUri: Uri? = null
     private var imageNumber: Int = 0
+    private val AUTOCOMPLETE_REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +45,21 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
         saveDetails.setOnClickListener{
             uploadImage(username)
+        }
+
+        Places.initialize(applicationContext, "AIzaSyBCTCIpS4t1m9HgmCuUowaoxKSa7vJQShw")
+
+        val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
+
+        customAutocompleteEditText.setOnClickListener {
+            val intent = Autocomplete.IntentBuilder(
+                AutocompleteActivityMode.FULLSCREEN,
+                listOf(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ADDRESS)
+            )
+                .setTypeFilter(TypeFilter.ADDRESS)
+                .setCountry("GB")
+                .build(this)
+            startActivityForResult(intent, 2)
         }
 
         val banner = findViewById<ImageView>(R.id.banner)
@@ -73,6 +99,18 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 2) {
+            if (resultCode == Activity.RESULT_OK) {
+                val place = Autocomplete.getPlaceFromIntent(data!!)
+                val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
+                customAutocompleteEditText.setText(place.address)
+            } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
+                val status = Autocomplete.getStatusFromIntent(data!!)
+                Log.e(ContentValues.TAG, "Error: Status = ${status.statusMessage}")
+            }
+        }
+
         if (resultCode == RESULT_OK && requestCode == RESULT_LOAD_IMAGE && data != null) {
 
             val image0 = findViewById<ImageView>(R.id.banner)
@@ -112,6 +150,44 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
                         val database = Firebase.database.getReference("users")
                         database.child(user).get().addOnSuccessListener {
                             if(it.exists()) {
+                                val loggedInUser = application as Username
+                                val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
+                                var address = customAutocompleteEditText.text.toString()
+
+                                val editTxt = findViewById<EditText>(R.id.editTextTextPersonName)
+                                var username = editTxt.text.toString()
+
+                                val passTxt = findViewById<EditText>(R.id.editTextTextPassword2)
+                                var password = passTxt.text.toString()
+
+                                val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
+                                var phone = phoneTxt.text.toString()
+
+                                if (address == "") {
+                                    address = it.child("address").value.toString()
+                                }
+
+                                if (username == "") {
+                                    username = it.child("username").value.toString()
+                                }
+
+                                if (password == "") {
+                                    password = it.child("password").value.toString()
+                                }
+
+                                if (phone == "") {
+                                    phone = it.child("phone").value.toString()
+                                }
+
+                                val database = Firebase.database.getReference("users")
+                                val values = User(username, password, phone, address)
+                                val deleteRef = Firebase.database.getReference("users/"+loggedInUser.username)
+                                deleteRef.removeValue()
+                                database.child(username).setValue(values)
+                                loggedInUser.username = username
+
+                                loggedInUser.profilePictureUri = profilePictureUri.toString()
+                                loggedInUser.bannerUri = bannerUri.toString()
                                 val intent = Intent(this, Profile::class.java)
                                 intent.putExtra("username", username)
                                 startActivity(intent)

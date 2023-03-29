@@ -1,6 +1,7 @@
 package com.example.carsellingandbuyingapp
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -31,9 +33,44 @@ class MapsPage : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
+        val loggedInUser = application as Username
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.profile -> {
+                    val username = loggedInUser.username
+                    val intent = Intent(this@MapsPage, Profile::class.java)
+                    intent.putExtra("username", username)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.map -> {
+                    startActivity(Intent(this, MapsPage::class.java))
+                    true
+                }
+                R.id.browse -> {
+                    val intent = Intent(this, MainPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+                    true
+                    true
+                }
+                R.id.sellCar -> {
+                    val intent = Intent(this@MapsPage, SellCar::class.java)
+                    intent.putExtra("username", loggedInUser.username)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                else -> false
+            }
+        }
 
         }
 

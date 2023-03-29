@@ -5,13 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.TextUtils.indexOf
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.cardview.widget.CardView
-import androidx.core.content.FileProvider
-import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -35,8 +31,10 @@ class MainPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
 
-        var username = intent.getStringExtra("username")
+
         val loggedInUser = application as Username
+        var username = loggedInUser.username
+            //intent.getStringExtra("username")
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
@@ -204,50 +202,6 @@ class MainPage : AppCompatActivity() {
         }
     }
 
-    fun preprocessData(carData: String): FloatArray {
-        // Split the string into separate values
-        val carValues = carData.split(":")
-
-        // Extract the numerical and categorical features
-        val numericalFeatures = intArrayOf(carValues[1].toInt(), carValues[4].toInt(), carValues[7].toInt())
-        val categoricalFeatures = arrayOf(carValues[2], carValues[3], carValues[5], carValues[6], carValues[8])
-
-        // Normalize the numerical features using MinMaxScaler
-        val minMaxValues = arrayOf(
-            Pair(0, 1000), // price
-            Pair(1900, 2022), // year
-            Pair(0, 300000) // mileage
-        )
-
-        val normalizedNumericalFeatures = numericalFeatures.mapIndexed { index, value ->
-            val (min, max) = minMaxValues[index]
-            (value - min).toFloat() / (max - min)
-        }
-
-        // One-hot encode the categorical features
-        val colorCategories = listOf("BLUE", "RED", "SILVER", "BLACK", "WHITE", "OTHER")
-        val conditionCategories = listOf("Perfect Condition", "Good Condition", "Fair Condition", "Poor Condition")
-        val fuelCategories = listOf("DIESEL", "PETROL", "HYBRID", "ELECTRIC")
-        val makeCategories = listOf("BMW", "MERCEDES", "AUDI", "TOYOTA", "HONDA", "OTHER")
-        val modelCategories = listOf("3 Series", "C Class", "A4", "Corolla", "Civic", "OTHER")
-
-        val oneHotColor = oneHotEncode(colorCategories, categoricalFeatures[0])
-        val oneHotCondition = oneHotEncode(conditionCategories, categoricalFeatures[1])
-        val oneHotFuel = oneHotEncode(fuelCategories, categoricalFeatures[2])
-        val oneHotMake = oneHotEncode(makeCategories, categoricalFeatures[3])
-        val oneHotModel = oneHotEncode(modelCategories, categoricalFeatures[4])
-
-        // Concatenate the numerical and categorical features
-        return floatArrayOf(
-            *normalizedNumericalFeatures.toFloatArray(),
-            *oneHotColor,
-            *oneHotCondition,
-            *oneHotFuel,
-            *oneHotMake,
-            *oneHotModel
-        )
-    }
-
     fun oneHotEncode(categories: List<String>, value: String): FloatArray {
         val index = categories.indexOf(value)
         return FloatArray(categories.size) { if (it == index) 1.0f else 0.0f }
@@ -269,5 +223,4 @@ class MainPage : AppCompatActivity() {
         file.writeBytes(bytes)
         return Uri.fromFile(file)
     }
-
 }

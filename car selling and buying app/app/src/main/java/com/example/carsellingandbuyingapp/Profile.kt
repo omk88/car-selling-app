@@ -2,6 +2,8 @@ package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -23,6 +26,7 @@ import com.google.firebase.storage.ktx.storage
 
 class Profile : AppCompatActivity() {
     private lateinit var adapter: ItemAdapter2
+    var address: String = ""
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +34,6 @@ class Profile : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         val loggedInUser = application as Username
-
-        val emptyList = findViewById<TextView>(R.id.emptyMessage)
-        emptyList.visibility = View.VISIBLE
 
         val username = intent.getStringExtra("username").toString()
 
@@ -64,9 +65,45 @@ class Profile : AppCompatActivity() {
 
         val databaseUsers = Firebase.database.getReference("users")
 
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.profile -> {
+                    val intent = Intent(this@Profile, Profile::class.java)
+                    intent.putExtra("username", loggedInUser.username)
+                    intent.putExtra("bannerUri", bannerUri)
+                    intent.putExtra("profilePictureUri", profilePictureUri)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.map -> {
+                    val intent = Intent(this@Profile, MapsPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.browse -> {
+                    val intent = Intent(this, MainPage::class.java)
+                    intent.putExtra("address", address)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+                    true
+                }
+                R.id.sellCar -> {
+                    val intent = Intent(this@Profile, SellCar::class.java)
+                    intent.putExtra("username", loggedInUser.username)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                else -> false
+            }
+        }
+
         databaseUsers.child(username).get().addOnSuccessListener {
             if (it.exists()) {
-                val address = it.child("address").value.toString()
+                address = it.child("address").value.toString()
 
                 val regex = Regex(",\\s*([a-zA-Z]+)\\s*[a-zA-Z]*\\s*\\d")
                 val matchResult = regex.find(address)
@@ -171,7 +208,6 @@ class Profile : AppCompatActivity() {
                                     val seller = it.child("seller").value.toString()
                                     if (seller == username) {
                                         cars.add(item)
-                                        emptyList.visibility = View.INVISIBLE
                                         adapter.notifyDataSetChanged()
                                     }
                                 }

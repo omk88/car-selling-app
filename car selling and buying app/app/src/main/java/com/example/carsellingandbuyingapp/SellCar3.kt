@@ -111,7 +111,6 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
                         val database = Firebase.database.getReference("users")
                         database.child(user).get().addOnSuccessListener {
                             if(it.exists()) {
-                                println("EXISTS")
                                 val address = it.child("address").toString()
                                 val intent = Intent(this, MainPage::class.java)
                                 intent.putExtra("address", address)

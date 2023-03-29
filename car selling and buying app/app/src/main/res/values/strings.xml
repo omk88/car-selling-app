@@ -13,4 +13,6 @@
     <string name="GoodCondition"><b>Good Condition</b> - Includes cars that have minor body damage but are generally in good condition and have no functional issues.</string>
     <string name="SparesOrRepairs"><b>Spares or Repairs</b> - Includes cars that are non-functional or have major faults that prevent the car from working as intended.</string>
     <string name="PerfectCondition"><b>Perfect Condition</b> - Includes cars that have no cosmetic or functional issues.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
