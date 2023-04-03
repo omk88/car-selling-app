@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
                     val loggedInUser = application as Username
                     loggedInUser.username = it.child("username").value.toString()
+                    loggedInUser.sales = it.child("sales").value.toString().toInt()
+                    loggedInUser.ecoSales = it.child("ecoSales").value.toString().toInt()
                     val intent = Intent(this, MainPage::class.java)
                     intent.putExtra("username",it.child("username").value.toString())
                     startActivity(intent)

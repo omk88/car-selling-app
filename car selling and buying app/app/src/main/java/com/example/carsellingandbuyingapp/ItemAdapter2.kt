@@ -1,5 +1,6 @@
 package com.example.carsellingandbuyingapp
 
+import android.app.Application
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +15,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class ItemAdapter2(private val cars: MutableList<Item>, private val loggedInUser: Boolean) :
+class ItemAdapter2(private val cars: MutableList<Item>, private val loggedInUser: Boolean, private val application: Username, private val username: String) :
     RecyclerView.Adapter<ItemAdapter2.ViewHolder>() {
 
     private var listener: OnItemClickListener? = null
@@ -37,9 +38,12 @@ class ItemAdapter2(private val cars: MutableList<Item>, private val loggedInUser
         val textView7: TextView = itemView.findViewById(R.id.reg)
 
         val removeButton = itemView.findViewById<ImageView>(R.id.removeButton)
+        val soldButton = itemView.findViewById<ImageView>(R.id.soldButton)
 
         init {
             removeButton.visibility = View.INVISIBLE
+            soldButton.visibility = View.INVISIBLE
+
             itemView.setOnClickListener {
                 listener?.onItemClick(itemView, adapterPosition)
             }
@@ -54,6 +58,68 @@ class ItemAdapter2(private val cars: MutableList<Item>, private val loggedInUser
                     removeButton.startAnimation(animation)
                     removeButton.visibility = View.VISIBLE
 
+                    soldButton.startAnimation(animation)
+                    soldButton.visibility = View.VISIBLE
+
+                    soldButton.setOnClickListener {
+                        val position = adapterPosition
+                        if (position != RecyclerView.NO_POSITION) {
+                            val item = cars[position]
+                            val database = Firebase.database.getReference("cars")
+                            val databaseUsers = Firebase.database.getReference("users")
+
+                            application.sales += 1
+                            val userRef = databaseUsers.child(username)
+
+                            userRef.child("sales").get().addOnSuccessListener { snapshot ->
+                                if (snapshot.exists()) {
+                                    val currentSales = snapshot.value.toString().toInt()
+                                    userRef.child("sales").setValue(currentSales + 1)
+                                } else {
+                                    // Handle the case where the "sales" field doesn't exist, if necessary
+                                }
+                            }.addOnFailureListener { exception ->
+                                Log.e(TAG, "Failed to get the sales value: ${exception.message}")
+                            }
+
+                            database.child(item.text7).get().addOnSuccessListener { snapshot ->
+                                if (snapshot.exists()) {
+
+                                    val engineCapacity = snapshot.child("engineCapacity").value.toString().toInt()
+
+                                    if (engineCapacity < 100) {
+                                        application.ecoSales += 1
+                                        userRef.child("ecoSales").get().addOnSuccessListener { snapshot ->
+                                            if (snapshot.exists()) {
+                                                val currentSales = snapshot.value.toString().toInt()
+                                                userRef.child("ecoSales").setValue(currentSales + 1)
+                                            } else {
+                                                // Handle the case where the "sales" field doesn't exist, if necessary
+                                            }
+                                        }.addOnFailureListener { exception ->
+                                            Log.e(TAG, "Failed to get the sales value: ${exception.message}")
+                                        }
+                                    }
+
+                                    snapshot.ref.removeValue().addOnSuccessListener {
+                                        cars.removeAt(position)
+                                        notifyItemRemoved(position)
+                                    }.addOnFailureListener { exception ->
+                                        Log.e(
+                                            TAG,
+                                            "Failed to delete the database entry: ${exception.message}"
+                                        )
+                                    }
+                                } else {
+                                    Log.e(
+                                        TAG,
+                                        "Database entry not found for item at position $position"
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     removeButton.setOnClickListener {
                         val position = adapterPosition
                         if (position != RecyclerView.NO_POSITION) {
@@ -62,6 +128,7 @@ class ItemAdapter2(private val cars: MutableList<Item>, private val loggedInUser
 
                             database.child(item.text7).get().addOnSuccessListener { snapshot ->
                                 if (snapshot.exists()) {
+
                                     snapshot.ref.removeValue().addOnSuccessListener {
                                         cars.removeAt(position)
                                         notifyItemRemoved(position)

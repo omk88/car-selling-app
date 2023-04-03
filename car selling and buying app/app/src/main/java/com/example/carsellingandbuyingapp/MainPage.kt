@@ -34,7 +34,6 @@ class MainPage : AppCompatActivity() {
 
         val loggedInUser = application as Username
         var username = loggedInUser.username
-            //intent.getStringExtra("username")
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
@@ -63,40 +62,40 @@ class MainPage : AppCompatActivity() {
         val cardView = findViewById<CardView>(R.id.cardView)
         val search = findViewById<EditText>(R.id.search)
 
-        /*search.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                val layoutParams = cardView.layoutParams
-                layoutParams.height = (280 * resources.displayMetrics.density).toInt()
-                cardView.layoutParams = layoutParams
-            }
-            false
-        }*/
+        search.setOnClickListener {
+            val intent = Intent(this, Search::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up)
+        }
 
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.profile -> {
-                    username = loggedInUser.username
                     val intent = Intent(this@MainPage, Profile::class.java)
-                    intent.putExtra("username", username)
-                    intent.putExtra("bannerUri", bannerUri.toString())
-                    intent.putExtra("profilePictureUri", profilePictureUri.toString())
+                    intent.putExtra("username", loggedInUser.username)
+                    intent.putExtra("bannerUri", bannerUri)
+                    intent.putExtra("profilePictureUri", profilePictureUri)
                     startActivity(intent)
                     overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.map -> {
-                    startActivity(Intent(this, MapsPage::class.java))
+                    val intent = Intent(this@MainPage, MapsPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.browse -> {
-
+                    val intent = Intent(this, MainPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.sellCar -> {
                     val intent = Intent(this@MainPage, SellCar::class.java)
-                    intent.putExtra("username", username)
+                    intent.putExtra("username", loggedInUser.username)
                     startActivity(intent)
                     overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true

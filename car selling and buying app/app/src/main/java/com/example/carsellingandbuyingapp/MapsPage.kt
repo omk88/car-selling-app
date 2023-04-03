@@ -43,22 +43,22 @@ class MapsPage : AppCompatActivity(), OnMapReadyCallback {
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.profile -> {
-                    val username = loggedInUser.username
                     val intent = Intent(this@MapsPage, Profile::class.java)
-                    intent.putExtra("username", username)
+                    intent.putExtra("username", loggedInUser.username)
                     startActivity(intent)
                     overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.map -> {
-                    startActivity(Intent(this, MapsPage::class.java))
+                    val intent = Intent(this@MapsPage, MapsPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.browse -> {
                     val intent = Intent(this, MainPage::class.java)
                     startActivity(intent)
-                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
-                    true
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
                 R.id.sellCar -> {

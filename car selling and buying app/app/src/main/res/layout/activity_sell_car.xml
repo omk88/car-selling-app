@@ -39,6 +39,7 @@
         android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextCarMileage"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -61,6 +62,7 @@
         android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextCarModel"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -99,6 +101,7 @@
             android:orientation="vertical">
 
             <RadioGroup
+                android:textColor="#803B3B3B"
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -106,6 +109,7 @@
                 tools:layout_editor_absoluteY="377dp">
 
                 <RadioButton
+                    android:textColor="#803B3B3B"
                     android:id="@+id/radioButton2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -113,9 +117,10 @@
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
                     android:text="@string/SparesOrRepairs"
-                    android:buttonTint="#bfd3f2"/>
+                    android:buttonTint="#803B3B3B"/>
 
                 <RadioButton
+                    android:textColor="#803B3B3B"
                     android:id="@+id/radioButton3"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -123,9 +128,10 @@
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
                     android:text="@string/PoorCondition"
-                    android:buttonTint="#bfd3f2"/>
+                    android:buttonTint="#803B3B3B"/>
 
                 <RadioButton
+                    android:textColor="#803B3B3B"
                     android:id="@+id/radioButton4"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -133,9 +139,10 @@
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
                     android:text="@string/GoodCondition"
-                    android:buttonTint="#bfd3f2"/>
+                    android:buttonTint="#803B3B3B"/>
 
                 <RadioButton
+                    android:textColor="#803B3B3B"
                     android:id="@+id/radioButton5"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -143,13 +150,14 @@
                     android:paddingTop="7dp"
                     android:paddingBottom="7dp"
                     android:text="@string/PerfectCondition"
-                    android:buttonTint="#bfd3f2"/>
+                    android:buttonTint="#803B3B3B"/>
 
             </RadioGroup>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextCarRegistration"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -172,6 +180,7 @@
         android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextCarPrice"
         android:layout_width="280dp"
         android:layout_height="45dp"

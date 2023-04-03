@@ -1,29 +1,22 @@
 package com.example.carsellingandbuyingapp
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.VoicemailContract
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -95,13 +88,25 @@ class register : AppCompatActivity() {
         val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
         val phone = phoneTxt.text.toString()
 
+        val verifiedPhone = "0"
+        val verifiedEmail = "0"
+        val eco0 = "0"
+        val eco1 = "0"
+        val eco2 = "0"
+        val sale0 = "0"
+        val sale1 = "0"
+        val sale2 = "0"
+
+        val sales = 0
+        val ecoSales = 0
+
         val database = Firebase.database.getReference("users")
-        val user = User(username, password, phone, address)
+        val user = User(username, password, phone, address, verifiedPhone, verifiedEmail, eco0, eco1, eco2, sale0, sale1, sale2, sales, ecoSales)
         database.child(username).setValue(user)
 
         Toast.makeText(this, "Successfully Registered!", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this@register,MainActivity::class.java))
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
 
 
         var storageRef = Firebase.storage.reference

@@ -9,6 +9,7 @@
 
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextTextPersonUsername"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -31,6 +32,7 @@
 
 
     <EditText
+        android:textColor="#803B3B3B"
         android:id="@+id/editTextTextPassword"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -71,15 +73,15 @@
         android:id="@+id/textViewLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign in"
-        android:textSize="34sp"
         android:fontFamily="@font/poppins_regular"
+        android:text="Sign In"
+        android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/editTextTextPersonUsername"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.879" />
+        app:layout_constraintVertical_bias="0.907" />
 
     <TextView
         android:id="@+id/textView5"
@@ -125,11 +127,13 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="140dp"
-        android:layout_height="139dp"
+        android:layout_width="115dp"
+        android:layout_height="115dp"
         app:layout_constraintBottom_toTopOf="@+id/textViewLogin"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.861"
         app:srcCompat="@drawable/caricon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

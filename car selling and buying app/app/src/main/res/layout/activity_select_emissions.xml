@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="#E7E7E7">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/setEmissions"
+        android:layout_width="300dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="124dp"
+        android:background="@drawable/button_background"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center"
+        android:text="Set CO2 Emissions"
+        android:textColor="#36454F"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout19"
+        android:layout_width="308dp"
+        android:layout_height="345dp"
+        android:layout_marginTop="100dp"
+        android:background="@drawable/edit_text_background"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLogin7">
+
+        <TextView
+            android:id="@+id/textViewLogin6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:gravity="center"
+            android:paddingBottom="20dp"
+            android:text="Minimum Emissions:"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+
+            android:id="@+id/minEmissions"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:background="@drawable/edit_text_background"
+            android:ems="10"
+            android:fontFamily="@font/poppins_regular"
+            android:hint="Minimum Emissions"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingLeft="15dp"
+            android:paddingTop="7.5dp"
+            android:paddingBottom="5.5dp"
+            android:textColor="#803B3B3B"
+            android:textCursorDrawable="@drawable/cursor_color"
+            android:textSize="20sp"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
+            app:layout_constraintBottom_toTopOf="@+id/textViewLogin8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewLogin8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.8"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="Maximum Price:"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/maxEmissions"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:background="@drawable/edit_text_background"
+            android:ems="10"
+            android:fontFamily="@font/poppins_regular"
+            android:hint="Maximum Emissions"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingLeft="15dp"
+            android:paddingTop="7.5dp"
+            android:paddingBottom="5.5dp"
+            android:textColor="#803B3B3B"
+            android:textCursorDrawable="@drawable/cursor_color"
+            android:textSize="20sp"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewLogin7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:alpha="0.8"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:text="Select Maximum and Minimum CO2 Emissions"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

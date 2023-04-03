@@ -7,6 +7,7 @@
 
     <EditText xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:textColor="#803B3B3B"
         android:id="@+id/custom_autocomplete_edit_text"
         android:layout_width="280dp"
         android:layout_height="45dp"

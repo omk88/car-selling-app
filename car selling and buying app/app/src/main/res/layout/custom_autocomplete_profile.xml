@@ -28,5 +28,5 @@
         app:layout_constraintStart_toStartOf="parent"
         android:focusable="false"
         android:textColorHint="#A3A3A3"
-        android:textColor="#A3A3A3"/>
+        android:textColor="#803B3B3B"/>
 </merge>

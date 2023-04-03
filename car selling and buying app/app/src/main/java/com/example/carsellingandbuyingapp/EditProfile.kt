@@ -2,8 +2,11 @@ package com.example.carsellingandbuyingapp
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.net.Uri
@@ -16,6 +19,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -25,7 +29,12 @@ import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 
 class EditProfile : AppCompatActivity(), View.OnClickListener {
 
@@ -43,10 +52,11 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
         val saveDetails = findViewById<Button>(R.id.saveDetails)
 
-        saveDetails.setOnClickListener{
-            uploadImage(username)
+        saveDetails.setOnClickListener {
+            lifecycleScope.launch {
+                uploadImage(username)
+            }
         }
-
         Places.initialize(applicationContext, "AIzaSyBCTCIpS4t1m9HgmCuUowaoxKSa7vJQShw")
 
         val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
@@ -129,9 +139,9 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun uploadImage(username: String) {
-        var storageRef = Firebase.storage.reference
-        var pd = ProgressDialog(this@EditProfile)
+    private suspend fun uploadImage(username: String) = coroutineScope {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val pd = ProgressDialog(this@EditProfile)
         pd.setTitle("Saving Details...")
         pd.show()
 
@@ -141,71 +151,104 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
         val uris = arrayOf(bannerUri, profilePictureUri)
         val images = arrayOf(banner, profilePicture)
 
+        val compressedAndResizedImages = uris.map {
+            try {
+                compressAndResizeImage(it)
+            } catch (e: IllegalArgumentException) {
+                Log.e("EditProfile", "Failed to compress and resize image: ${e.message}")
+                ByteArray(0)
+            }
+        }.toTypedArray()
+
+        val uploadResults = mutableListOf<Boolean>()
+
         for (i in 0..1) {
-            uris[i]?.let {
-                images[i].putFile(it).addOnSuccessListener {
-                    if(i == 1) {
-                        val loggedInUser = application as Username
-                        val user = loggedInUser.username
-                        val database = Firebase.database.getReference("users")
-                        database.child(user).get().addOnSuccessListener {
-                            if(it.exists()) {
-                                val loggedInUser = application as Username
-                                val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
-                                var address = customAutocompleteEditText.text.toString()
-
-                                val editTxt = findViewById<EditText>(R.id.editTextTextPersonName)
-                                var username = editTxt.text.toString()
-
-                                val passTxt = findViewById<EditText>(R.id.editTextTextPassword2)
-                                var password = passTxt.text.toString()
-
-                                val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
-                                var phone = phoneTxt.text.toString()
-
-                                if (address == "") {
-                                    address = it.child("address").value.toString()
-                                }
-
-                                if (username == "") {
-                                    username = it.child("username").value.toString()
-                                }
-
-                                if (password == "") {
-                                    password = it.child("password").value.toString()
-                                }
-
-                                if (phone == "") {
-                                    phone = it.child("phone").value.toString()
-                                }
-
-                                val database = Firebase.database.getReference("users")
-                                val values = User(username, password, phone, address)
-                                val deleteRef = Firebase.database.getReference("users/"+loggedInUser.username)
-                                deleteRef.removeValue()
-                                database.child(username).setValue(values)
-                                loggedInUser.username = username
-
-                                loggedInUser.profilePictureUri = profilePictureUri.toString()
-                                loggedInUser.bannerUri = bannerUri.toString()
-                                val intent = Intent(this, Profile::class.java)
-                                intent.putExtra("username", username)
-                                startActivity(intent)
-                                overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
-                                pd.dismiss()
-                                Toast.makeText(this, "Saved Details!", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-
-                    }
-                }
-            }?.addOnFailureListener {
-                pd.dismiss()
-                Toast.makeText(this, "Failed to save details.", Toast.LENGTH_SHORT).show()
-            }?.addOnProgressListener {
-                var progressPercent: Double = (100.0 * it.bytesTransferred / it.totalByteCount)
-                pd.setMessage("Percentage: " + progressPercent.toInt() + "%")
+            launch {
+                val result = uploadSingleImage(uris[i], images[i], compressedAndResizedImages[i])
+                uploadResults.add(result)
             }
         }
+
+        // Wait for all uploads to complete
+        val allUploadsSuccessful = withContext(Dispatchers.Default) {
+            uploadResults.all { it }
+        }
+
+        pd.dismiss() // Dismiss the progress dialog
+
+        if (allUploadsSuccessful) {
+            // Handle successful uploads
+            val loggedInUser = application as Username
+            loggedInUser.profilePictureUri = profilePictureUri.toString()
+            loggedInUser.bannerUri = bannerUri.toString()
+
+            val intent = Intent(this@EditProfile, Profile::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+            Toast.makeText(this@EditProfile, "Saved Details!", Toast.LENGTH_SHORT).show()
+        } else {
+            // Handle failed uploads
+            Toast.makeText(this@EditProfile, "Failed to save details.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
+
+
+
+    private suspend fun uploadSingleImage(
+        uri: Uri?,
+        imageRef: StorageReference,
+        compressedAndResizedImage: ByteArray
+    ): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            imageRef.putBytes(compressedAndResizedImage).await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun compressAndResizeImage(uri: Uri?): ByteArray {
+        if (uri == null) {
+            throw IllegalArgumentException("Uri cannot be null")
+        }
+
+        val compressedImage = compressImage(uri, contentResolver)
+        val bitmap = BitmapFactory.decodeByteArray(compressedImage, 0, compressedImage.size)
+        val resizedBitmap = resizeImage(bitmap, maxWidth = 800, maxHeight = 800)
+
+        val outputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
+        return outputStream.toByteArray()
+    }
+
+
+    private fun compressImage(uri: Uri, contentResolver: ContentResolver, quality: Int = 75): ByteArray {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        return outputStream.toByteArray()
+    }
+
+    private fun resizeImage(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val ratioBitmap = width.toFloat() / height.toFloat()
+        val ratioMax = maxWidth.toFloat() / maxHeight.toFloat()
+
+        var finalWidth = maxWidth
+        var finalHeight = maxHeight
+        if (ratioMax > ratioBitmap) {
+            finalWidth = (maxHeight.toFloat() * ratioBitmap).toInt()
+        } else {
+            finalHeight = (maxWidth.toFloat() / ratioBitmap).toInt()
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true)
     }
 }

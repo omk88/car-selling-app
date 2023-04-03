@@ -37,6 +37,9 @@ android {
 }
 
 dependencies {
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+    implementation 'nl.dionsegijn:konfetti:1.2.5'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
     implementation 'org.tensorflow:tensorflow-lite:2.7.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     implementation 'com.github.haifengl:smile-core:2.6.0'

@@ -237,6 +237,15 @@
             android:layout_width="42dp"
             android:layout_height="42dp"
             app:srcCompat="@drawable/remove" />
+
+        <ImageView
+            android:padding="10dp"
+            android:layout_gravity="left"
+            android:id="@+id/soldButton"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            app:srcCompat="@drawable/mark" />
+
     </androidx.cardview.widget.CardView>
 </LinearLayout>
 

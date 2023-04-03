@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Profile"
-    android:background="#E7E7E7">
+    android:background="#E7E7E7"
+    android:id="@+id/activity_root">
 
 
 
@@ -177,7 +178,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView11"
+                    android:id="@+id/verifiedPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -185,7 +186,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView13"
+                    android:id="@+id/verifiedEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -193,7 +194,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView8"
+                    android:id="@+id/ecoBadge1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -201,7 +202,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView9"
+                    android:id="@+id/ecoBadge2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -209,7 +210,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView10"
+                    android:id="@+id/ecoBadge3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -217,7 +218,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView14"
+                    android:id="@+id/salesBadge1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -225,7 +226,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView15"
+                    android:id="@+id/salesBadge2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -233,7 +234,7 @@
 
                 <ImageView
                     android:padding="10dp"
-                    android:id="@+id/imageView16"
+                    android:id="@+id/salesBadge3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -319,5 +320,6 @@
         app:labelVisibilityMode="labeled" >
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

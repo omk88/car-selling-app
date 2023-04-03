@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/sell_car_gradient">
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button6"
         android:layout_width="280dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="164dp"
+        android:layout_marginBottom="260dp"
         android:background="@drawable/button_background"
         android:fontFamily="@font/poppins_regular"
         android:onClick="switchToSellCar"
@@ -25,7 +27,7 @@
         android:id="@+id/button7"
         android:layout_width="280dp"
         android:layout_height="45dp"
-        android:layout_marginBottom="232dp"
+        android:layout_marginBottom="320dp"
         android:background="@drawable/button_background"
         android:fontFamily="@font/poppins_regular"
         android:onClick="switchToSellCar3"
@@ -41,37 +43,47 @@
         android:id="@+id/textViewLogin3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="372dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/poppins_regular"
         android:text="Is this the right car?"
-        android:textSize="34sp"
+        android:textSize="27sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.879" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout6" />
 
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="360dp"
-        android:layout_height="232dp"
-        android:layout_marginTop="64dp"
-        app:cardBackgroundColor="#f5f7fa"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView3"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fontFamily="@font/poppins_regular"
-            android:padding="10dp"
-            android:text="TextView"
-            android:textColor="#848884"
-            android:textSize="20sp" />
-    </androidx.cardview.widget.CardView>
+            android:layout_gravity="center_vertical"
+            app:cardBackgroundColor="#f5f7fa"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/poppins_regular"
+                android:padding="17dp"
+                android:text="TextView"
+                android:textColor="#848884"
+                android:textSize="20sp" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
