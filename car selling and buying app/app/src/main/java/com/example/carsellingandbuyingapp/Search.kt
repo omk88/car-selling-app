@@ -2,7 +2,10 @@ package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -15,6 +18,16 @@ class Search : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor = Color.TRANSPARENT
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        }
+
 
         val fuelTypes = arrayOf("PETROL", "DIESEL", "HYBRID", "ELECTRICITY")
         val fuelType = findViewById<TextView>(R.id.fuelTypeText)
@@ -32,6 +45,13 @@ class Search : AppCompatActivity() {
         var selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
 
         var selectedColour = intent.getStringExtra("selected_colour")
+
+        val closeSearch = findViewById<LinearLayout>(R.id.close)
+
+        closeSearch.setOnClickListener {
+            startActivity(Intent(this@Search,MainPage::class.java))
+            overridePendingTransition(0, R.anim.slide_out_down)
+        }
 
         if (selectedColour == null) {
             selectedColour = "None"
@@ -93,22 +113,62 @@ class Search : AppCompatActivity() {
         val selectColour = findViewById<LinearLayout>(R.id.selectColour)
 
         selectColour.setOnClickListener {
-            startActivity(Intent(this@Search,SelectColour::class.java))
+            val intent = Intent(this@Search, SelectColour::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         selectEmissions.setOnClickListener {
-            startActivity(Intent(this@Search,SelectEmissions::class.java))
+            val intent = Intent(this@Search, SelectEmissions::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         selectPrice.setOnClickListener {
-            startActivity(Intent(this@Search,SelectPrice::class.java))
+            val intent = Intent(this@Search, SelectPrice::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         selectYear.setOnClickListener {
-            startActivity(Intent(this@Search,SelectYear::class.java))
+            val intent = Intent(this@Search, SelectYear::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 

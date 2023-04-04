@@ -23,10 +23,26 @@ class SelectPrice : AppCompatActivity() {
         val maxPrice = findViewById<EditText>(R.id.maxPrice)
         val setPriceButton = findViewById<Button>(R.id.setPrice)
 
+        val selectedMinYear = intent.getStringExtra("selected_minYear")
+        val selectedMaxYear = intent.getStringExtra("selected_maxYear")
+        val selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
+        val selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
+        val selectedColour = intent.getStringExtra("selected_colour")
+        val selectedModel = intent.getStringExtra("selected_model")
+        val selectedMake = intent.getStringExtra("selected_make")
+
+
         setPriceButton.setOnClickListener {
             val intent = Intent(this@SelectPrice, Search::class.java)
             intent.putExtra("selected_minPrice", minPrice.text.toString())
             intent.putExtra("selected_maxPrice", maxPrice.text.toString())
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }

@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="#E7E7E7">
+    android:background="#E7E7E7"
+    android:fitsSystemWindows="true">
 
 
     <LinearLayout
@@ -24,17 +25,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="20dp"
+            android:orientation="horizontal"
+            android:paddingRight="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
+            <LinearLayout
+                android:id="@+id/close"
+                android:layout_width="55dp"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:padding="18dp"
+                    android:id="@+id/imageView8"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/close" />
+            </LinearLayout>
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/reset"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginBottom="16dp"
+                android:layout_height="30dp"
                 android:background="@drawable/button_background"
                 android:fontFamily="@font/poppins_regular"
                 android:gravity="center"
@@ -45,6 +60,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -61,13 +77,11 @@
                 android:id="@+id/make"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_regular"
                 android:gravity="center"
                 android:padding="13dp"
                 android:text="Make"
                 android:textColor="#898989"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="49dp" />
 
@@ -84,18 +98,22 @@
                     android:id="@+id/makeText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_regular"
                     android:gravity="center"
                     android:padding="13dp"
                     android:text="ALL"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
 
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:id="@+id/selectModel"
@@ -116,8 +134,7 @@
                 android:padding="13dp"
                 android:text="Model"
                 android:textColor="#898989"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="49dp" />
 
@@ -139,13 +156,18 @@
                     android:padding="13dp"
                     android:text="ANY"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
 
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:id="@+id/selectPrice"
@@ -174,8 +196,7 @@
                     android:padding="13dp"
                     android:text="Price"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
@@ -207,8 +228,7 @@
                         android:padding="13dp"
                         android:text="Minimum: £500"
                         android:textColor="#898989"
-                        android:textSize="19sp"
-                        android:textStyle="bold"
+                        android:textSize="17sp"
                         tools:layout_editor_absoluteX="0dp"
                         tools:layout_editor_absoluteY="49dp" />
 
@@ -221,13 +241,18 @@
                         android:padding="13dp"
                         android:text="Maximum: £1500"
                         android:textColor="#898989"
-                        android:textSize="19sp"
-                        android:textStyle="bold"
+                        android:textSize="17sp"
                         tools:layout_editor_absoluteX="0dp"
                         tools:layout_editor_absoluteY="49dp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -266,8 +291,7 @@
                     android:padding="13dp"
                     android:text="Age"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
@@ -290,8 +314,7 @@
                     android:padding="13dp"
                     android:text="Minimum: 2006"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
 
@@ -304,13 +327,18 @@
                     android:padding="13dp"
                     android:text="Maximum: 2023"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
 
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -330,8 +358,7 @@
                 android:padding="13dp"
                 android:text="Fuel Type"
                 android:textColor="#898989"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="49dp" />
 
@@ -353,12 +380,17 @@
                     android:padding="13dp"
                     android:text="PETROL"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:id="@+id/selectEmissions"
@@ -388,8 +420,7 @@
                     android:padding="13dp"
                     android:text="CO2 Emissions"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
@@ -412,8 +443,7 @@
                     android:padding="13dp"
                     android:text="Minimum: 0"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
 
@@ -426,12 +456,17 @@
                     android:padding="13dp"
                     android:text="Maximum: 247"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:id="@+id/selectColour"
@@ -452,8 +487,7 @@
                 android:padding="13dp"
                 android:text="Colour"
                 android:textColor="#898989"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="49dp" />
 
@@ -475,12 +509,17 @@
                     android:padding="13dp"
                     android:text="BLACK"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
         </LinearLayout>
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="340dp"
+            android:layout_height="1dp"
+            android:background="#898989"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -500,8 +539,7 @@
                 android:padding="13dp"
                 android:text="Distance"
                 android:textColor="#898989"
-                android:textSize="19sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="49dp" />
 
@@ -523,8 +561,7 @@
                     android:padding="13dp"
                     android:text="+15 Miles"
                     android:textColor="#898989"
-                    android:textSize="19sp"
-                    android:textStyle="bold"
+                    android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
                     tools:layout_editor_absoluteY="49dp" />
             </LinearLayout>
@@ -537,6 +574,8 @@
             android:gravity="center"
             android:orientation="vertical"
             android:paddingTop="20dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -544,7 +583,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button2"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/button_background"
                 android:fontFamily="@font/poppins_regular"

@@ -14,6 +14,14 @@ class SelectEmissions : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_emissions)
 
+        val selectedMake = intent.getStringExtra("selected_make")
+        val selectedModel = intent.getStringExtra("selected_model")
+        val selectedMinPrice = intent.getStringExtra("selected_minPrice")
+        val selectedMaxPrice = intent.getStringExtra("selected_maxPrice")
+        val selectedMinYear = intent.getStringExtra("selected_minYear")
+        val selectedMaxYear = intent.getStringExtra("selected_maxYear")
+        val selectedColour = intent.getStringExtra("selected_colour")
+
         val minEmissions = findViewById<EditText>(R.id.minEmissions)
         val maxEmissions = findViewById<EditText>(R.id.maxEmissions)
         val setEmissionsButton = findViewById<Button>(R.id.setEmissions)
@@ -22,6 +30,13 @@ class SelectEmissions : AppCompatActivity() {
             val intent = Intent(this@SelectEmissions, Search::class.java)
             intent.putExtra("selected_minEmissions", minEmissions.text.toString())
             intent.putExtra("selected_maxEmissions", maxEmissions.text.toString())
+            intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }

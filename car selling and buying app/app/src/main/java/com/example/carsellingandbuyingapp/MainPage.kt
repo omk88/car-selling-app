@@ -65,7 +65,7 @@ class MainPage : AppCompatActivity() {
         search.setOnClickListener {
             val intent = Intent(this, Search::class.java)
             startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_up, R.anim.slide_out_up)
+            overridePendingTransition(R.anim.slide_in_up, 0)
         }
 
 

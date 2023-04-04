@@ -15,6 +15,15 @@ class SelectColour : AppCompatActivity() {
 
         val linearLayout = findViewById<LinearLayout>(R.id.verticalLinearLayout)
 
+        val selectedMake = intent.getStringExtra("selected_make")
+        val selectedModel = intent.getStringExtra("selected_model")
+        val selectedMinPrice = intent.getStringExtra("selected_minPrice")
+        val selectedMaxPrice = intent.getStringExtra("selected_maxPrice")
+        val selectedMinYear = intent.getStringExtra("selected_minYear")
+        val selectedMaxYear = intent.getStringExtra("selected_maxYear")
+        val selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
+        val selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
+
         val items = resources.getStringArray(R.array.colour_items)
 
         for (item in items) {
@@ -28,6 +37,14 @@ class SelectColour : AppCompatActivity() {
             textView.setOnClickListener {
                 val intent = Intent(this@SelectColour, Search::class.java)
                 intent.putExtra("selected_colour", textView.text.toString())
+                intent.putExtra("selected_make", selectedMake)
+                intent.putExtra("selected_model", selectedModel)
+                intent.putExtra("selected_minPrice", selectedMinPrice)
+                intent.putExtra("selected_maxPrice", selectedMaxPrice)
+                intent.putExtra("selected_minYear", selectedMinYear)
+                intent.putExtra("selected_maxYear", selectedMaxYear)
+                intent.putExtra("selected_minEmissions", selectedMinEmissions)
+                intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             }

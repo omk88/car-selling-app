@@ -20,5 +20,12 @@
         <item name="android:textColor">#803B3B3B</item>
         <item name="android:colorControlActivated">#80A3A3A3</item>
     </style>
+    <style name="Theme.AppCompat.Translucent" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
 </resources>
