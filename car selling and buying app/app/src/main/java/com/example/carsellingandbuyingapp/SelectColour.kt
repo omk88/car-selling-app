@@ -23,6 +23,7 @@ class SelectColour : AppCompatActivity() {
         val selectedMaxYear = intent.getStringExtra("selected_maxYear")
         val selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
         val selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
+        val selectedFuelType = intent.getStringExtra("selected_fuelType")
 
         val items = resources.getStringArray(R.array.colour_items)
 
@@ -45,6 +46,7 @@ class SelectColour : AppCompatActivity() {
                 intent.putExtra("selected_maxYear", selectedMaxYear)
                 intent.putExtra("selected_minEmissions", selectedMinEmissions)
                 intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+                intent.putExtra("selected_fuelType", selectedFuelType)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             }

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -28,8 +29,7 @@ class Search : AppCompatActivity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         }
 
-
-        val fuelTypes = arrayOf("PETROL", "DIESEL", "HYBRID", "ELECTRICITY")
+        val fuelTypes = arrayOf("ALL", "PETROL", "DIESEL", "HYBRID", "ELECTRICITY")
         val fuelType = findViewById<TextView>(R.id.fuelTypeText)
 
         var selectedMake = intent.getStringExtra("selected_make")
@@ -44,14 +44,25 @@ class Search : AppCompatActivity() {
         var selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
         var selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
 
+        var selectedFuelType = intent.getStringExtra("selected_fuelType")
+
         var selectedColour = intent.getStringExtra("selected_colour")
 
         val closeSearch = findViewById<LinearLayout>(R.id.close)
+
 
         closeSearch.setOnClickListener {
             startActivity(Intent(this@Search,MainPage::class.java))
             overridePendingTransition(0, R.anim.slide_out_down)
         }
+
+        if (selectedFuelType == null) {
+            selectedFuelType = "ALL"
+        } else {
+            selectedFuelType = intent.getStringExtra("selected_fuelType")
+        }
+
+        fuelType.text = selectedFuelType
 
         if (selectedColour == null) {
             selectedColour = "None"
@@ -107,6 +118,23 @@ class Search : AppCompatActivity() {
             intent.getStringExtra("selected_model").toString()
         }
 
+        val searchButton = findViewById<Button>(R.id.searchButton)
+        searchButton.setOnClickListener {
+            val mainPageIntent = Intent(this@Search, MainPage::class.java)
+            mainPageIntent.putExtra("selected_make", selectedMake)
+            mainPageIntent.putExtra("selected_model", selectedModel)
+            mainPageIntent.putExtra("selected_minPrice", selectedMinPrice)
+            mainPageIntent.putExtra("selected_maxPrice", selectedMaxPrice)
+            mainPageIntent.putExtra("selected_minYear", selectedMinYear)
+            mainPageIntent.putExtra("selected_maxYear", selectedMaxYear)
+            mainPageIntent.putExtra("selected_fuelType", fuelType.text)
+            mainPageIntent.putExtra("selected_minEmissions", selectedMinEmissions)
+            mainPageIntent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            mainPageIntent.putExtra("selected_colour", selectedColour)
+            startActivity(mainPageIntent)
+            overridePendingTransition(0, R.anim.slide_out_down)
+        }
+
         val selectPrice = findViewById<LinearLayout>(R.id.selectPrice)
         val selectYear = findViewById<LinearLayout>(R.id.selectAge)
         val selectEmissions = findViewById<LinearLayout>(R.id.selectEmissions)
@@ -123,6 +151,7 @@ class Search : AppCompatActivity() {
             intent.putExtra("selected_minEmissions", selectedMinEmissions)
             intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
             intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_fuelType", fuelType.text)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
@@ -138,6 +167,7 @@ class Search : AppCompatActivity() {
             intent.putExtra("selected_minEmissions", selectedMinEmissions)
             intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
             intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_fuelType", fuelType.text)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
@@ -153,6 +183,7 @@ class Search : AppCompatActivity() {
             intent.putExtra("selected_minEmissions", selectedMinEmissions)
             intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
             intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_fuelType", fuelType.text)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
@@ -168,6 +199,7 @@ class Search : AppCompatActivity() {
             intent.putExtra("selected_minEmissions", selectedMinEmissions)
             intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
             intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_fuelType", fuelType.text)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
@@ -192,19 +224,72 @@ class Search : AppCompatActivity() {
         maxYearText.text = "Maximum: "+selectedMaxYear
         makeText.text = selectedMake
         modelText.text = selectedModel
+
+        val reset = findViewById<Button>(R.id.reset)
+
+        reset.setOnClickListener {
+            colourText.text = "ALL"
+            minEmissionsText.text = "Minimum: None"
+            maxEmissionsText.text = "Maximum: None"
+            minPriceText.text = "Minimum: None"
+            maxPriceText.text = "Maximum: None"
+            minYearText.text = "Minimum: None"
+            maxYearText.text = "Maximum: None"
+            makeText.text = "ALL"
+            modelText.text = "ANY"
+
+            selectedMake = "ALL"
+            selectedModel = "ANY"
+            selectedMinPrice = "None"
+            selectedMaxPrice = "None"
+            selectedMinYear = "None"
+            selectedMaxYear = "None"
+            selectedMinEmissions = "None"
+            selectedMaxEmissions = "None"
+            selectedColour = "ALL"
+        }
+        
         selectMake.setOnClickListener {
-            startActivity(Intent(this@Search,SelectMake::class.java))
+            val intent = Intent(this@Search, SelectMake::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPrice)
+            intent.putExtra("selected_maxPrice", selectedMaxPrice)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            intent.putExtra("selected_fuelType", fuelType.text)
+            startActivity(intent)
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
+        val model = findViewById<TextView>(R.id.model)
+
         if(makeText.text != "ALL") {
+            model.setTextColor(Color.parseColor("#898989"))
+            modelText.setTextColor(Color.parseColor("#898989"))
             val selectModel = findViewById<LinearLayout>(R.id.selectModel)
             selectModel.setOnClickListener {
                 val intent = Intent(this@Search, SelectModel::class.java)
+                intent.putExtra("selected_make", makeText.text.toString())
                 intent.putExtra("selected_make", selectedMake)
+                intent.putExtra("selected_model", selectedModel)
+                intent.putExtra("selected_minPrice", selectedMinPrice)
+                intent.putExtra("selected_maxPrice", selectedMaxPrice)
+                intent.putExtra("selected_minYear", selectedMinYear)
+                intent.putExtra("selected_maxYear", selectedMaxYear)
+                intent.putExtra("selected_minEmissions", selectedMinEmissions)
+                intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+                intent.putExtra("selected_colour", selectedColour)
+                intent.putExtra("selected_fuelType", fuelType.text)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             }
+        } else {
+            model.setTextColor(Color.parseColor("#B3B3B3"))
+            modelText.setTextColor(Color.parseColor("#B3B3B3"))
         }
 
         fuelType.setOnClickListener {

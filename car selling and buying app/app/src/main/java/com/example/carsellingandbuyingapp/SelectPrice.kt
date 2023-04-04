@@ -30,6 +30,7 @@ class SelectPrice : AppCompatActivity() {
         val selectedColour = intent.getStringExtra("selected_colour")
         val selectedModel = intent.getStringExtra("selected_model")
         val selectedMake = intent.getStringExtra("selected_make")
+        val selectedFuelType = intent.getStringExtra("selected_fuelType")
 
 
         setPriceButton.setOnClickListener {
@@ -43,6 +44,7 @@ class SelectPrice : AppCompatActivity() {
             intent.putExtra("selected_colour", selectedColour)
             intent.putExtra("selected_minYear", selectedMinYear)
             intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_fuelType", selectedFuelType)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }

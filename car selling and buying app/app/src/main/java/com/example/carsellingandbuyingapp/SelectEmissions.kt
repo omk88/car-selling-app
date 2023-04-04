@@ -21,6 +21,7 @@ class SelectEmissions : AppCompatActivity() {
         val selectedMinYear = intent.getStringExtra("selected_minYear")
         val selectedMaxYear = intent.getStringExtra("selected_maxYear")
         val selectedColour = intent.getStringExtra("selected_colour")
+        val selectedFuelType = intent.getStringExtra("selected_fuelType")
 
         val minEmissions = findViewById<EditText>(R.id.minEmissions)
         val maxEmissions = findViewById<EditText>(R.id.maxEmissions)
@@ -37,6 +38,7 @@ class SelectEmissions : AppCompatActivity() {
             intent.putExtra("selected_maxPrice", selectedMaxPrice)
             intent.putExtra("selected_minYear", selectedMinYear)
             intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_fuelType", selectedFuelType)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }

@@ -378,7 +378,7 @@
                     android:fontFamily="@font/poppins_regular"
                     android:gravity="center"
                     android:padding="13dp"
-                    android:text="PETROL"
+                    android:text="ALL"
                     android:textColor="#898989"
                     android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
@@ -507,7 +507,7 @@
                     android:fontFamily="@font/poppins_regular"
                     android:gravity="center"
                     android:padding="13dp"
-                    android:text="BLACK"
+                    android:text="ALL"
                     android:textColor="#898989"
                     android:textSize="17sp"
                     tools:layout_editor_absoluteX="0dp"
@@ -581,7 +581,7 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/button2"
+                android:id="@+id/searchButton"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginBottom="16dp"

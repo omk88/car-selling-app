@@ -20,6 +20,7 @@ class SelectModel : AppCompatActivity() {
         val selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
         val selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
         val selectedColour = intent.getStringExtra("selected_colour")
+        val selectedFuelType = intent.getStringExtra("selected_fuelType")
 
         val linearLayout = findViewById<LinearLayout>(R.id.verticalLinearLayout)
 
@@ -159,6 +160,7 @@ class SelectModel : AppCompatActivity() {
                 intent.putExtra("selected_maxPrice", selectedMaxPrice)
                 intent.putExtra("selected_minYear", selectedMinYear)
                 intent.putExtra("selected_maxYear", selectedMaxYear)
+                intent.putExtra("selected_fuelType", selectedFuelType)
                 startActivity(intent)
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             }

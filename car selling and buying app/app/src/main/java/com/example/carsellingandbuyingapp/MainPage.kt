@@ -31,6 +31,17 @@ class MainPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
 
+        var selectedMake = intent.getStringExtra("selected_make")
+        var selectedModel = intent.getStringExtra("selected_model")
+        var selectedMinPrice = intent.getStringExtra("selected_minPrice")?.drop(1)
+        var selectedMaxPrice = intent.getStringExtra("selected_maxPrice")?.drop(1)
+        var selectedMinYear = intent.getStringExtra("selected_minYear")
+        var selectedMaxYear = intent.getStringExtra("selected_maxYear")
+        var selectedFuelType = intent.getStringExtra("selected_fuelType")
+        var selectedMinEmissions = intent.getStringExtra("selected_minEmissions")
+        var selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
+        var selectedColour = intent.getStringExtra("selected_colour")
+
 
         val loggedInUser = application as Username
         var username = loggedInUser.username
@@ -63,7 +74,33 @@ class MainPage : AppCompatActivity() {
         val search = findViewById<EditText>(R.id.search)
 
         search.setOnClickListener {
+
+            var selectedMinPriceIntent = ""
+            var selectedMaxPriceIntent = ""
+
+            if ((selectedMinPrice == "one") || (selectedMinPrice == null)) {
+                selectedMinPriceIntent = "None"
+            } else {
+                selectedMinPriceIntent = "£"+selectedMinPrice
+            }
+
+            if ((selectedMaxPrice == "one") || (selectedMaxPrice == null)) {
+                selectedMaxPriceIntent = "None"
+            } else {
+                selectedMaxPriceIntent = "£"+selectedMaxPrice
+            }
+
             val intent = Intent(this, Search::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPriceIntent)
+            intent.putExtra("selected_maxPrice", selectedMaxPriceIntent)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_fuelType", selectedFuelType)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_up, 0)
         }
@@ -170,8 +207,127 @@ class MainPage : AppCompatActivity() {
                                 condition,
                                 registration)
 
-                            cars.add(item)
-                            adapter.notifyDataSetChanged()
+                            var flag = false
+
+
+                            if ((selectedMake == null) && (selectedModel == null) && (selectedMinPrice == null)
+                                && (selectedMaxPrice == null) && (selectedMinYear == null) && (selectedMaxYear == null)
+                                && (selectedFuelType == null) && (selectedColour == null) && (selectedMinEmissions == null)
+                                && (selectedMaxEmissions == null)) {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                            }
+
+                            var makeFilter = false
+                            var modelFilter = false
+                            var priceFilter = false
+                            var yearFilter = false
+                            var fuelTypeFilter = false
+                            var emissionsFilter = false
+                            var colourFilter = false
+
+                            if (selectedMake != "ALL") {
+                                makeFilter = true
+                            }
+
+                            if (selectedModel != "ANY") {
+                                modelFilter = true
+                            }
+
+                            if ((selectedMinPrice != "one") && (selectedMaxPrice != "one")) {
+                                priceFilter = true
+                            }
+
+                            if ((selectedMinYear != "None") && (selectedMaxYear != "None")) {
+                                yearFilter = true
+                            }
+
+                            if (selectedFuelType != "ALL") {
+                                fuelTypeFilter = true
+                            }
+
+                            if (selectedFuelType != "ALL") {
+                                colourFilter = true
+                            }
+
+                            if ((selectedMinEmissions != "None") && (selectedMaxEmissions != "None")) {
+                                emissionsFilter = true
+                            }
+
+                            if (!flag &&
+                                (!makeFilter || (selectedMake == make)) &&
+                                (!modelFilter || (model == selectedModel)) &&
+                                (!priceFilter || (selectedMinPrice != null && selectedMaxPrice != null && price.drop(1).toInt() >= selectedMinPrice.toInt() && price.drop(1).toInt() <= selectedMaxPrice.toInt())) &&
+                                (!yearFilter || (yearOfManufacture.toInt() >= selectedMinYear?.toInt()?: 0 && yearOfManufacture.toInt() <= selectedMaxYear?.toInt()?: 0)) &&
+                                (!fuelTypeFilter || (fuelType == selectedFuelType)) &&
+                                (!emissionsFilter || (emissions.toInt() >= selectedMinEmissions?.toInt()?: 0 && emissions.toInt() <= selectedMaxEmissions?.toInt()?: 0)) &&
+                                (!colourFilter || (selectedColour == colour))) {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                            }
+
+
+                            /*if ((fuelType == selectedFuelType) && (flag == false) && (selectedFuelType != "ALL") ) {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                                println(make+" selectedFuelType")
+                            }
+
+                            if ((yearOfManufacture.toInt() >= selectedMinYear?.toInt()?: 0) && (yearOfManufacture.toInt() <= selectedMaxYear?.toInt()?: 0) && (flag == false) && (selectedMinYear != "None") && (selectedMaxYear != "None")) {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                                println(make+" selectedYear")
+                            }
+
+                            val finalSelectedMinPrice = selectedMinPrice
+                            val finalSelectedMaxPrice = selectedMaxPrice
+
+                            if (finalSelectedMinPrice != null && finalSelectedMaxPrice != null && finalSelectedMinPrice != "None" && finalSelectedMaxPrice != "None" &&
+                                (price.drop(1).toInt() >= finalSelectedMinPrice.toInt()) &&
+                                (price.drop(1).toInt() <= finalSelectedMaxPrice.toInt()) &&
+                                !flag)
+                            {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                                println(make+" selectedPrice")
+                            }*/
+
+                            /*if ((selectedMake == null) && (flag == false)) {
+                                flag = true
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                                println(make+" selectedMake")
+                            }*/
+
+
+
+
+                            /*if(selectedMake == null) {
+                                cars.add(item)
+                                adapter.notifyDataSetChanged()
+                            } else if (selectedMinPrice != null) {
+                                if (selectedMaxPrice != null) {
+                                    if ((make == selectedMake) && (selectedModel == "ANY")) {
+                                        if ((selectedMinPrice != "None") && (selectedMaxPrice != "None")) {
+                                            if ((price.drop(1).toInt() >= selectedMinPrice!!.toInt()) && (price.drop(1).toInt() <= selectedMaxPrice!!.toInt()))
+                                            {
+                                                if ((yearOfManufacture.toInt() >= selectedMinYear?.toInt()!!) && (yearOfManufacture.toInt() <= selectedMaxYear?.toInt()!!)) {
+                                                    cars.add(item)
+                                                    adapter.notifyDataSetChanged()
+                                                }
+                                            }
+                                        } else {
+                                            cars.add(item)
+                                            adapter.notifyDataSetChanged()
+                                        }
+                                    }
+                                }
+                            }*/
                         }
                     }
                 }

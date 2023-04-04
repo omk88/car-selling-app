@@ -1669,6 +1669,7 @@
         <item>1900</item>
     </string-array>
     <string-array name="colour_items">
+        <item>ALL</item>
         <item>BLACK</item>
         <item>WHITE</item>
         <item>SILVER</item>
