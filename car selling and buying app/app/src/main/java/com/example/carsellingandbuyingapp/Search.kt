@@ -1,11 +1,14 @@
 package com.example.carsellingandbuyingapp
 
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -30,7 +33,7 @@ class Search : AppCompatActivity() {
         }
 
         val fuelTypes = arrayOf("ALL", "PETROL", "DIESEL", "HYBRID", "ELECTRICITY")
-        val fuelType = findViewById<TextView>(R.id.fuelTypeText)
+        var fuelType = findViewById<TextView>(R.id.fuelTypeText)
 
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
@@ -65,7 +68,7 @@ class Search : AppCompatActivity() {
         fuelType.text = selectedFuelType
 
         if (selectedColour == null) {
-            selectedColour = "None"
+            selectedColour = "ALL"
         } else {
             intent.getStringExtra("selected_colour").toString()
         }
@@ -228,15 +231,16 @@ class Search : AppCompatActivity() {
         val reset = findViewById<Button>(R.id.reset)
 
         reset.setOnClickListener {
-            colourText.text = "ALL"
-            minEmissionsText.text = "Minimum: None"
-            maxEmissionsText.text = "Maximum: None"
-            minPriceText.text = "Minimum: None"
-            maxPriceText.text = "Maximum: None"
-            minYearText.text = "Minimum: None"
-            maxYearText.text = "Maximum: None"
-            makeText.text = "ALL"
-            modelText.text = "ANY"
+            animateTextChange(colourText, "ALL")
+            animateTextChange(minEmissionsText, "Minimum: None")
+            animateTextChange(maxEmissionsText, "Maximum: None")
+            animateTextChange(minPriceText, "Minimum: None")
+            animateTextChange(maxPriceText, "Maximum: None")
+            animateTextChange(minYearText, "Minimum: None")
+            animateTextChange(maxYearText, "Maximum: None")
+            animateTextChange(makeText, "ALL")
+            animateTextChange(modelText, "ANY")
+            animateTextChange(fuelType, "ALL")
 
             selectedMake = "ALL"
             selectedModel = "ANY"
@@ -247,6 +251,7 @@ class Search : AppCompatActivity() {
             selectedMinEmissions = "None"
             selectedMaxEmissions = "None"
             selectedColour = "ALL"
+            fuelType.text = "ALL"
         }
         
         selectMake.setOnClickListener {
@@ -308,5 +313,26 @@ class Search : AppCompatActivity() {
             val alertDialog = builder.create()
             alertDialog.show()
         }
+    }
+
+    private fun animateTextChange(textView: TextView, newText: String) {
+        val fadeOut = AlphaAnimation(1.0f, 0.0f).apply {
+            duration = 300
+            setAnimationListener(object : AnimatorListenerAdapter(), Animation.AnimationListener {
+                override fun onAnimationEnd(animation: Animation?) {
+                    textView.text = newText
+
+                    val fadeIn = AlphaAnimation(0.0f, 1.0f).apply {
+                        duration = 300
+                    }
+                    textView.startAnimation(fadeIn)
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+                override fun onAnimationStart(animation: Animation?) {}
+            })
+        }
+
+        textView.startAnimation(fadeOut)
     }
 }

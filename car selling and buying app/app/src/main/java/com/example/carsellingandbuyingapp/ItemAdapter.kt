@@ -4,13 +4,17 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.ListView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 
 class ItemAdapter(context: Context, private val items: List<Item>) :
     ArrayAdapter<Item>(context, R.layout.list_item_card_view, items) {
+
+    private val shouldApplyAnimation = mutableSetOf<Int>()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view: View
@@ -65,7 +69,22 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.removeButton.visibility = View.INVISIBLE
         viewHolder.soldButton.visibility = View.INVISIBLE
 
+        if (shouldApplyAnimation.contains(position)) {
+            fadeIn(view)
+            shouldApplyAnimation.remove(position)
+        }
+
         return view
+    }
+
+    fun applyFadeInAnimation(position: Int) {
+        shouldApplyAnimation.add(position)
+    }
+
+    private fun fadeIn(view: View) {
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
+        view.startAnimation(fadeInAnim)
     }
 
     private class ViewHolder(view: View) {
@@ -79,11 +98,8 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         val textView5: TextView = view.findViewById(R.id.textView5)
         val textView6: TextView = view.findViewById(R.id.textView6)
         val textView7: TextView = view.findViewById(R.id.reg)
-
         val removeButton = view.findViewById<ImageView>(R.id.removeButton)
         val soldButton = view.findViewById<ImageView>(R.id.soldButton)
-
     }
-
-
 }
+

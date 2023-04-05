@@ -1,7 +1,10 @@
 package com.example.carsellingandbuyingapp
 
 import android.app.ProgressDialog
+import android.content.ContentResolver
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +16,8 @@ import android.widget.Toast
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.io.ByteArrayOutputStream
+import java.util.concurrent.atomic.AtomicInteger
 
 class SellCar3 : AppCompatActivity(), View.OnClickListener {
 
@@ -87,6 +92,46 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun compressAndResizeImage(uri: Uri?): ByteArray {
+        if (uri == null) {
+            throw IllegalArgumentException("Uri cannot be null")
+        }
+
+        val compressedImage = compressImage(uri, contentResolver)
+        val bitmap = BitmapFactory.decodeByteArray(compressedImage, 0, compressedImage.size)
+        val resizedBitmap = resizeImage(bitmap, maxWidth = 800, maxHeight = 800)
+
+        val outputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
+        return outputStream.toByteArray()
+    }
+
+    private fun compressImage(uri: Uri, contentResolver: ContentResolver, quality: Int = 75): ByteArray {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        return outputStream.toByteArray()
+    }
+
+    private fun resizeImage(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val ratioBitmap = width.toFloat() / height.toFloat()
+        val ratioMax = maxWidth.toFloat() / maxHeight.toFloat()
+
+        var finalWidth = maxWidth
+        var finalHeight = maxHeight
+        if (ratioMax > ratioBitmap) {
+            finalWidth = (maxHeight.toFloat() * ratioBitmap).toInt()
+        } else {
+            finalHeight = (maxWidth.toFloat() / ratioBitmap).toInt()
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true)
+    }
+
     private fun uploadImage() {
         val intent = intent
         val registration = intent.getStringExtra("registration")
@@ -102,35 +147,41 @@ class SellCar3 : AppCompatActivity(), View.OnClickListener {
         val uris = arrayOf(imageUri0, imageUri1, imageUri2)
         val images = arrayOf(carImage0, carImage1, carImage2)
 
+        val urlList = mutableListOf<String?>("", "", "")
+
+        val successfulUploads = AtomicInteger(0)
+
         for (i in 0..2) {
-            uris[i]?.let {
-                images[i].putFile(it).addOnSuccessListener {
-                    if(i == 2) {
-                        val loggedInUser = application as Username
-                        val user = loggedInUser.username
-                        val database = Firebase.database.getReference("users")
-                        database.child(user).get().addOnSuccessListener {
-                            if(it.exists()) {
-                                val address = it.child("address").toString()
-                                val intent = Intent(this, MainPage::class.java)
-                                intent.putExtra("address", address)
-                                startActivity(intent)
-                                overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
-                                pd.dismiss()
-                                Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+            uris[i]?.let { uri ->
+                val compressedAndResizedImage = compressAndResizeImage(uri)
+                val uploadTask = images[i].putBytes(compressedAndResizedImage)
+
+                uploadTask.addOnSuccessListener {
+                    images[i].downloadUrl.addOnSuccessListener { _ ->
+                        if (successfulUploads.incrementAndGet() == 3) {
+                            val loggedInUser = application as Username
+                            val user = loggedInUser.username
+                            val database = Firebase.database.getReference("users")
+                            database.child(user).get().addOnSuccessListener { dataSnapshot ->
+                                if (dataSnapshot.exists()) {
+                                    val address = dataSnapshot.child("address").value.toString()
+                                    val intent = Intent(this, MainPage::class.java)
+                                    intent.putExtra("address", address)
+                                    startActivity(intent)
+                                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+                                    pd.dismiss()
+                                    Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         }
-
                     }
+                }.addOnFailureListener { exception ->
+                    // Handle unsuccessful uploads
+                    Toast.makeText(applicationContext, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
-            }?.addOnFailureListener {
-                pd.dismiss()
-                Toast.makeText(this, "Failed to Post Car.", Toast.LENGTH_SHORT).show()
-            }?.addOnProgressListener {
-                var progressPercent: Double = (100.0 * it.bytesTransferred / it.totalByteCount)
-                pd.setMessage("Percentage: " + progressPercent.toInt() + "%")
             }
         }
+
     }
 
     private fun addCar() {

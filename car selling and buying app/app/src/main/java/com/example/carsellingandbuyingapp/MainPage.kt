@@ -2,12 +2,22 @@ package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.*
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.widget.AdapterView
+import android.widget.EditText
+import android.widget.ListView
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.view.GravityCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -17,8 +27,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.File
-import java.util.*
-import kotlin.String
+import java.util.ArrayList
 
 class MainPage : AppCompatActivity() {
 
@@ -31,6 +40,8 @@ class MainPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
 
+
+
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
         var selectedMinPrice = intent.getStringExtra("selected_minPrice")?.drop(1)
@@ -42,69 +53,16 @@ class MainPage : AppCompatActivity() {
         var selectedMaxEmissions = intent.getStringExtra("selected_maxEmissions")
         var selectedColour = intent.getStringExtra("selected_colour")
 
-
         val loggedInUser = application as Username
         var username = loggedInUser.username
+
+
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
 
         var bannerUri: Uri? = null
         var profilePictureUri: Uri? = null
-
-        bannerRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
-            bannerUri = getImageUriFromBytes(bytes)
-            loggedInUser.bannerUri = bannerUri.toString()
-            username?.let {}
-        }.addOnFailureListener { exception ->
-            // handle error
-        }
-
-        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
-            profilePictureUri = getImageUriFromBytes(bytes)
-            loggedInUser.profilePictureUri = profilePictureUri.toString()
-            username?.let {}
-        }.addOnFailureListener { exception ->
-            // handle error
-        }
-
-        carRecommendationModel = CarRecommendationModel(this)
-
-        val cardView = findViewById<CardView>(R.id.cardView)
-        val search = findViewById<EditText>(R.id.search)
-
-        search.setOnClickListener {
-
-            var selectedMinPriceIntent = ""
-            var selectedMaxPriceIntent = ""
-
-            if ((selectedMinPrice == "one") || (selectedMinPrice == null)) {
-                selectedMinPriceIntent = "None"
-            } else {
-                selectedMinPriceIntent = "£"+selectedMinPrice
-            }
-
-            if ((selectedMaxPrice == "one") || (selectedMaxPrice == null)) {
-                selectedMaxPriceIntent = "None"
-            } else {
-                selectedMaxPriceIntent = "£"+selectedMaxPrice
-            }
-
-            val intent = Intent(this, Search::class.java)
-            intent.putExtra("selected_make", selectedMake)
-            intent.putExtra("selected_model", selectedModel)
-            intent.putExtra("selected_minPrice", selectedMinPriceIntent)
-            intent.putExtra("selected_maxPrice", selectedMaxPriceIntent)
-            intent.putExtra("selected_minYear", selectedMinYear)
-            intent.putExtra("selected_maxYear", selectedMaxYear)
-            intent.putExtra("selected_fuelType", selectedFuelType)
-            intent.putExtra("selected_minEmissions", selectedMinEmissions)
-            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
-            intent.putExtra("selected_colour", selectedColour)
-            startActivity(intent)
-            overridePendingTransition(R.anim.slide_in_up, 0)
-        }
-
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -141,6 +99,59 @@ class MainPage : AppCompatActivity() {
             }
         }
 
+        bannerRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            bannerUri = getImageUriFromBytes(bytes)
+            loggedInUser.bannerUri = bannerUri.toString()
+            username?.let {}
+        }.addOnFailureListener { exception ->
+            // handle error
+        }
+
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            profilePictureUri = getImageUriFromBytes(bytes)
+            loggedInUser.profilePictureUri = profilePictureUri.toString()
+            username?.let {}
+        }.addOnFailureListener { exception ->
+            // handle error
+        }
+
+        carRecommendationModel = CarRecommendationModel(this)
+
+        val cardView = findViewById<CardView>(R.id.cardView)
+        val search = findViewById<EditText>(R.id.search)
+
+        search.setOnClickListener {
+
+            var selectedMinPriceIntent = ""
+            var selectedMaxPriceIntent = ""
+
+            if ((selectedMinPrice == "one") || (selectedMinPrice == null)) {
+                selectedMinPriceIntent = "None"
+            } else {
+                selectedMinPriceIntent = "£" + selectedMinPrice
+            }
+
+            if ((selectedMaxPrice == "one") || (selectedMaxPrice == null)) {
+                selectedMaxPriceIntent = "None"
+            } else {
+                selectedMaxPriceIntent = "£" + selectedMaxPrice
+            }
+
+            val intent = Intent(this, Search::class.java)
+            intent.putExtra("selected_make", selectedMake)
+            intent.putExtra("selected_model", selectedModel)
+            intent.putExtra("selected_minPrice", selectedMinPriceIntent)
+            intent.putExtra("selected_maxPrice", selectedMaxPriceIntent)
+            intent.putExtra("selected_minYear", selectedMinYear)
+            intent.putExtra("selected_maxYear", selectedMaxYear)
+            intent.putExtra("selected_fuelType", selectedFuelType)
+            intent.putExtra("selected_minEmissions", selectedMinEmissions)
+            intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+            intent.putExtra("selected_colour", selectedColour)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_up, 0)
+        }
+
         val database = Firebase.database.getReference("cars")
         val cars = mutableListOf<Item>()
 
@@ -149,16 +160,17 @@ class MainPage : AppCompatActivity() {
         val adapter = ItemAdapter(this, cars)
         mListView.adapter = adapter
 
-        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            val clickedCardView = view.findViewById<CardView>(R.id.cardView)
-            var registration = clickedCardView.findViewById<TextView>(R.id.reg).text.toString()
+        mListView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                val clickedCardView = view.findViewById<CardView>(R.id.cardView)
+                var registration = clickedCardView.findViewById<TextView>(R.id.reg).text.toString()
 
-            val intent = Intent(this@MainPage, CarSalePage::class.java)
-            intent.putExtra("carData", registration)
-            startActivity(intent)
+                val intent = Intent(this@MainPage, CarSalePage::class.java)
+                intent.putExtra("carData", registration)
+                startActivity(intent)
 
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-        }
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            }
 
         database.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(
@@ -200,12 +212,13 @@ class MainPage : AppCompatActivity() {
                                 image1Uri.toString(),
                                 image0Uri.toString(),
                                 price,
-                                make+" "+model,
+                                make + " " + model,
                                 yearOfManufacture,
                                 mileage,
                                 address,
                                 condition,
-                                registration)
+                                registration
+                            )
 
                             var flag = false
 
@@ -217,6 +230,8 @@ class MainPage : AppCompatActivity() {
                                 flag = true
                                 cars.add(item)
                                 adapter.notifyDataSetChanged()
+                                val viewPosition = cars.size - 1
+                                adapter.applyFadeInAnimation(viewPosition)
                             }
 
                             var makeFilter = false
@@ -266,73 +281,13 @@ class MainPage : AppCompatActivity() {
                                 flag = true
                                 cars.add(item)
                                 adapter.notifyDataSetChanged()
+                                val viewPosition = cars.size - 1
+                                adapter.applyFadeInAnimation(viewPosition)
                             }
-
-
-                            /*if ((fuelType == selectedFuelType) && (flag == false) && (selectedFuelType != "ALL") ) {
-                                flag = true
-                                cars.add(item)
-                                adapter.notifyDataSetChanged()
-                                println(make+" selectedFuelType")
-                            }
-
-                            if ((yearOfManufacture.toInt() >= selectedMinYear?.toInt()?: 0) && (yearOfManufacture.toInt() <= selectedMaxYear?.toInt()?: 0) && (flag == false) && (selectedMinYear != "None") && (selectedMaxYear != "None")) {
-                                flag = true
-                                cars.add(item)
-                                adapter.notifyDataSetChanged()
-                                println(make+" selectedYear")
-                            }
-
-                            val finalSelectedMinPrice = selectedMinPrice
-                            val finalSelectedMaxPrice = selectedMaxPrice
-
-                            if (finalSelectedMinPrice != null && finalSelectedMaxPrice != null && finalSelectedMinPrice != "None" && finalSelectedMaxPrice != "None" &&
-                                (price.drop(1).toInt() >= finalSelectedMinPrice.toInt()) &&
-                                (price.drop(1).toInt() <= finalSelectedMaxPrice.toInt()) &&
-                                !flag)
-                            {
-                                flag = true
-                                cars.add(item)
-                                adapter.notifyDataSetChanged()
-                                println(make+" selectedPrice")
-                            }*/
-
-                            /*if ((selectedMake == null) && (flag == false)) {
-                                flag = true
-                                cars.add(item)
-                                adapter.notifyDataSetChanged()
-                                println(make+" selectedMake")
-                            }*/
-
-
-
-
-                            /*if(selectedMake == null) {
-                                cars.add(item)
-                                adapter.notifyDataSetChanged()
-                            } else if (selectedMinPrice != null) {
-                                if (selectedMaxPrice != null) {
-                                    if ((make == selectedMake) && (selectedModel == "ANY")) {
-                                        if ((selectedMinPrice != "None") && (selectedMaxPrice != "None")) {
-                                            if ((price.drop(1).toInt() >= selectedMinPrice!!.toInt()) && (price.drop(1).toInt() <= selectedMaxPrice!!.toInt()))
-                                            {
-                                                if ((yearOfManufacture.toInt() >= selectedMinYear?.toInt()!!) && (yearOfManufacture.toInt() <= selectedMaxYear?.toInt()!!)) {
-                                                    cars.add(item)
-                                                    adapter.notifyDataSetChanged()
-                                                }
-                                            }
-                                        } else {
-                                            cars.add(item)
-                                            adapter.notifyDataSetChanged()
-                                        }
-                                    }
-                                }
-                            }*/
                         }
                     }
                 }
             }
-
             override fun onChildChanged(
                 snapshot: DataSnapshot, @Nullable previousChildName: String?
             ) {
@@ -357,20 +312,10 @@ class MainPage : AppCompatActivity() {
         }
     }
 
-    fun oneHotEncode(categories: List<String>, value: String): FloatArray {
-        val index = categories.indexOf(value)
-        return FloatArray(categories.size) { if (it == index) 1.0f else 0.0f }
-    }
-
-    private fun startProfileActivity(username: String, bannerUri: Uri, profilePictureUri: Uri) {
-        val intent = Intent(this@MainPage, Profile::class.java)
-        intent.putExtra("username", username)
-        intent.putExtra("bannerUri", bannerUri.toString())
-        intent.putExtra("profilePictureUri", profilePictureUri.toString())
-        println("BANNER"+bannerUri.toString())
-        println("PROFILE"+profilePictureUri.toString())
-        startActivity(intent)
-        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+    private fun fadeIn(view: View) {
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
+        view.startAnimation(fadeInAnim)
     }
 
     private fun getImageUriFromBytes(bytes: ByteArray): Uri {

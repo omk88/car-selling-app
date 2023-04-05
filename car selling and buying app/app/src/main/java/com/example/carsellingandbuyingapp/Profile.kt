@@ -445,28 +445,43 @@ class Profile : AppCompatActivity() {
         val popupView = inflater.inflate(R.layout.popup_window_layout, null)
 
         val awardImageView = popupView.findViewById<ImageView>(R.id.award)
+        val awardTextView = popupView.findViewById<TextView>(R.id.awardText)
 
         if (award == 1) {
             awardImageView.setImageResource(R.drawable.badge)
+            awardTextView.text = "You have been awarded the eco-friendly badge for selling your first low emissions car!"
         } else if (award == 2) {
+            awardTextView.text = "You have been awarded the 20 eco sales badge for selling your twentieth low emissions car!"
             awardImageView.setImageResource(R.drawable.earth)
         } else if (award == 3) {
+            awardTextView.text = "You have been awarded the 100 eco sales badge for selling your one-hundredth low emissions car!"
             awardImageView.setImageResource(R.drawable.ecofriendly)
         } else if (award == 4) {
+            awardTextView.text = "You have been awarded the 10 sales badge for selling your tenth car!"
             awardImageView.setImageResource(R.drawable.trophy0)
         } else if (award == 5) {
+            awardTextView.text = "You have been awarded the 50 sales badge for selling your fifthtieth car!"
             awardImageView.setImageResource(R.drawable.trophy1)
         } else if (award == 6) {
+            awardTextView.text = "You have been awarded the 200 sales badge for selling your two-hundredth car!"
             awardImageView.setImageResource(R.drawable.trophy2)
         }
 
         popupView.startAnimation(fadeInAnimation)
+
+        val dimmedBackground = View(this)
+        dimmedBackground.layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
+        dimmedBackground.setBackgroundColor(Color.parseColor("#80000000"))
 
         val frameLayout = FrameLayout(this)
         frameLayout.layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT
         )
+        frameLayout.addView(dimmedBackground)
         frameLayout.addView(popupView)
 
         val konfettiView = nl.dionsegijn.konfetti.KonfettiView(profile)
@@ -498,7 +513,20 @@ class Profile : AppCompatActivity() {
                 override fun onAnimationRepeat(animation: Animation) {}
             })
         }
-    }
 
+        dimmedBackground.setOnTouchListener { _, _ ->
+            popupView.startAnimation(fadeOutAnimation)
+
+            fadeOutAnimation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    popupWindow.dismiss()
+                }
+                override fun onAnimationRepeat(animation: Animation) {}
+            })
+            true
+        }
+    }
 
 }
