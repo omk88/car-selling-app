@@ -44,10 +44,19 @@ class MainActivity : AppCompatActivity() {
                     loggedInUser.username = it.child("username").value.toString()
                     loggedInUser.sales = it.child("sales").value.toString().toInt()
                     loggedInUser.ecoSales = it.child("ecoSales").value.toString().toInt()
-                    val intent = Intent(this, MainPage::class.java)
-                    intent.putExtra("username",it.child("username").value.toString())
-                    startActivity(intent)
-                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+
+                    if(it.child("completedPreferences").value.toString().toInt() == 0) {
+                        val intent = Intent(this, GetStarted::class.java)
+                        intent.putExtra("username",it.child("username").value.toString())
+                        startActivity(intent)
+                        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    } else {
+                        val intent = Intent(this, MainPage::class.java)
+                        intent.putExtra("username",it.child("username").value.toString())
+                        startActivity(intent)
+                        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    }
+
                 } else {
                     Toast.makeText(this, "Password Incorrect", Toast.LENGTH_SHORT).show()
                 }

@@ -1,6 +1,7 @@
 package com.example.carsellingandbuyingapp
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,11 @@ import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.facebook.shimmer.ShimmerFrameLayout
+import com.bumptech.glide.request.target.Target
 
 class ItemAdapter(context: Context, private val items: List<Item>) :
     ArrayAdapter<Item>(context, R.layout.list_item_card_view, items) {
@@ -24,15 +30,51 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
             view = LayoutInflater.from(context).inflate(R.layout.list_item_card_view, parent, false)
             viewHolder = ViewHolder(view)
             view.tag = viewHolder
+            viewHolder.shimmerContainer1.startShimmer()
+            viewHolder.shimmerContainer2.startShimmer()
+            viewHolder.shimmerContainer3.startShimmer()
+
         } else {
             view = convertView
             viewHolder = view.tag as ViewHolder
+            viewHolder.shimmerContainer1.startShimmer()
+            viewHolder.shimmerContainer2.startShimmer()
+            viewHolder.shimmerContainer3.startShimmer()
         }
 
         val item = items[position]
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
+
         Glide.with(context)
             .load(item.image2Url)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer1.stopShimmer()
+                    viewHolder.shimmerContainer1.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer1.stopShimmer()
+                    viewHolder.shimmerContainer1.visibility = View.GONE
+                    viewHolder.imageView.startAnimation(fadeInAnim)
+                    return false
+                }
+            })
             .into(viewHolder.imageView)
+
         viewHolder.textView1.text = item.text1
         viewHolder.textView2.text = item.text2
         viewHolder.textView3.text = item.text3
@@ -45,7 +87,33 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
 
         Glide.with(context)
             .load(item.image1Url)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer2.stopShimmer()
+                    viewHolder.shimmerContainer2.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer2.stopShimmer()
+                    viewHolder.shimmerContainer2.visibility = View.GONE
+                    viewHolder.imageView2.startAnimation(fadeInAnim)
+                    return false
+                }
+            })
             .into(viewHolder.imageView2)
+
         viewHolder.textView1.text = item.text1
         viewHolder.textView2.text = item.text2
         viewHolder.textView3.text = item.text3
@@ -58,6 +126,31 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
 
         Glide.with(context)
             .load(item.image0Url)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer3.stopShimmer()
+                    viewHolder.shimmerContainer3.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    viewHolder.shimmerContainer3.stopShimmer()
+                    viewHolder.shimmerContainer3.visibility = View.GONE
+                    viewHolder.imageView3.startAnimation(fadeInAnim)
+                    return false
+                }
+            })
             .into(viewHolder.imageView3)
         viewHolder.textView1.text = item.text1
         viewHolder.textView2.text = item.text2
@@ -88,6 +181,9 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
     }
 
     private class ViewHolder(view: View) {
+        val shimmerContainer1: ShimmerFrameLayout = view.findViewById(R.id.shimmer_view_container1)
+        val shimmerContainer2: ShimmerFrameLayout = view.findViewById(R.id.shimmer_view_container2)
+        val shimmerContainer3: ShimmerFrameLayout = view.findViewById(R.id.shimmer_view_container3)
         val imageView: ImageView = view.findViewById(R.id.imageView)
         val imageView2: ImageView = view.findViewById(R.id.imageView2)
         val imageView3: ImageView = view.findViewById(R.id.imageView3)

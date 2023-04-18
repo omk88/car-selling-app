@@ -8,17 +8,38 @@
     android:background="#E7E7E7"
     android:id="@+id/activity_root">
 
-
-
-    <ImageView
-        android:scaleType="centerCrop"
-        android:id="@+id/banner"
-        android:layout_width="414dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="104dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/banner" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_view_container1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/Shimmer">
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <ImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/banner" />
+
+        </FrameLayout>
+    </LinearLayout>
 
 
     <ImageView
@@ -76,17 +97,36 @@
                     android:layout_weight="1">
                 </LinearLayout>
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_gravity="center_horizontal"
-                    android:id="@+id/profilePicture"
+                <LinearLayout
+                    android:id="@+id/layoutProfilePicture"
                     android:layout_width="140dp"
                     android:layout_height="140dp"
-                    android:src="@drawable/profile_picture"
-                    android:scaleType="centerCrop"
-                    app:civ_border_color="#E7E7E7"
-                    app:civ_border_width="3dp"
-                    android:padding="10dp"
-                    />
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <com.facebook.shimmer.ShimmerFrameLayout
+                            android:id="@+id/shimmer_view_container2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            style="@style/Shimmer">
+
+                        </com.facebook.shimmer.ShimmerFrameLayout>
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:layout_gravity="center_horizontal"
+                            android:id="@+id/profilePicture"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:src="@drawable/profile_picture"
+                            android:scaleType="centerCrop"
+                            app:civ_border_color="#E7E7E7"
+                            app:civ_border_width="3dp"
+                            android:padding="10dp" />
+                    </FrameLayout>
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/linearLayout9"

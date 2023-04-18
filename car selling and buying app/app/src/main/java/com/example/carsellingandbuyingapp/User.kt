@@ -13,4 +13,5 @@ data class User(val username : String? = null,
                 val sale1 : String? = null,
                 val sale2 : String? = null,
                 val sales : Int? = null,
-                val ecoSales : Int? = null)
+                val ecoSales : Int? = null,
+                val completedPreferences : Int? = null)

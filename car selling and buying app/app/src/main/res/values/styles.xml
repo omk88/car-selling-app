@@ -20,12 +20,26 @@
         <item name="android:textColor">#803B3B3B</item>
         <item name="android:colorControlActivated">#80A3A3A3</item>
     </style>
-    <style name="Theme.AppCompat.Translucent" parent="AppTheme">
+    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+    <style name="Shimmer">
+        <item name="shimmer_auto_start">true</item>
+        <item name="shimmer_duration">1000</item>
+        <item name="shimmer_repeat_mode">restart</item>
+        <item name="shimmer_shape">linear</item>
+        <item name="shimmer_tilt">20</item>
+        <item name="shimmer_highlight_color">#F0F0F0</item>
+        <item name="shimmer_base_color">#E0E0E0</item>
+    </style>
+    <style name="ConstantBackgroundTheme" parent="Theme.AppCompat.Translucent">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowBackground">@drawable/get_started_gradient</item>
+    </style>
+
 
 </resources>

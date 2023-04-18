@@ -3,15 +3,19 @@ package com.example.carsellingandbuyingapp
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.TypeFilter
@@ -29,6 +33,14 @@ class register : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
+
+        phoneTxt.setOnClickListener {
+            val intent = Intent(this, VerifyPhone::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_up, 0)
+        }
 
         Places.initialize(applicationContext, "AIzaSyBCTCIpS4t1m9HgmCuUowaoxKSa7vJQShw")
 
@@ -88,6 +100,7 @@ class register : AppCompatActivity() {
         val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
         val phone = phoneTxt.text.toString()
 
+
         val verifiedPhone = "0"
         val verifiedEmail = "0"
         val eco0 = "0"
@@ -100,8 +113,10 @@ class register : AppCompatActivity() {
         val sales = 0
         val ecoSales = 0
 
+        val completedPreferences = 0
+
         val database = Firebase.database.getReference("users")
-        val user = User(username, password, phone, address, verifiedPhone, verifiedEmail, eco0, eco1, eco2, sale0, sale1, sale2, sales, ecoSales)
+        val user = User(username, password, phone, address, verifiedPhone, verifiedEmail, eco0, eco1, eco2, sale0, sale1, sale2, sales, ecoSales, completedPreferences)
         database.child(username).setValue(user)
 
         Toast.makeText(this, "Successfully Registered!", Toast.LENGTH_SHORT).show()
@@ -132,5 +147,44 @@ class register : AppCompatActivity() {
         profileUploadTask.addOnSuccessListener { /* handle success */ }
             .addOnFailureListener { /* handle failure */ }
 
+    }
+
+    private fun sendSMS(phoneNumber: String, message: String) {
+        val smsManager = SmsManager.getDefault()
+        val parts = smsManager.divideMessage(message)
+        smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null)
+    }
+
+    private fun requestSmsPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.SEND_SMS),
+                MY_PERMISSIONS_REQUEST_SEND_SMS
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            MY_PERMISSIONS_REQUEST_SEND_SMS -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission granted, you can send SMS now
+                } else {
+                    // Permission denied, show a message or disable the SMS feature
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val MY_PERMISSIONS_REQUEST_SEND_SMS = 1
     }
 }

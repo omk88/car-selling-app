@@ -5,12 +5,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.LightingColorFilter
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
@@ -18,7 +20,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -38,6 +45,11 @@ class Profile : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        val shimmerContainer1 = findViewById<ShimmerFrameLayout>(R.id.shimmer_view_container1)
+        val shimmerContainer2 = findViewById<ShimmerFrameLayout>(R.id.shimmer_view_container2)
+        shimmerContainer1.startShimmer()
+        shimmerContainer2.startShimmer()
 
         val profile = this
 
@@ -116,19 +128,75 @@ class Profile : AppCompatActivity() {
         val profilePictureUri = loggedInUser.profilePictureUri
 
         val bannerImageUri = Uri.parse(bannerUri)
+
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
+
         Glide.with(this)
             .load(bannerImageUri)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    shimmerContainer1.stopShimmer()
+                    shimmerContainer1.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    shimmerContainer1.stopShimmer()
+                    shimmerContainer1.visibility = View.GONE
+                    banner.startAnimation(fadeInAnim)
+                    return false
+                }
+            })
+            .error(R.drawable.banner)
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
             .thumbnail(0.1f)
-            .error(R.drawable.banner)
             .into(banner)
 
+
         val profilePictureImageUri = Uri.parse(profilePictureUri)
+
         Glide.with(this)
             .load(profilePictureImageUri)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    shimmerContainer2.stopShimmer()
+                    shimmerContainer2.visibility = View.GONE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    shimmerContainer2.stopShimmer()
+                    shimmerContainer2.visibility = View.GONE
+                    profilePicture.startAnimation(fadeInAnim)
+                    return false
+                }
+            })
+            .error(R.drawable.profile_picture)
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
             .thumbnail(0.1f)
-            .error(R.drawable.profile_picture)
             .into(profilePicture)
 
 
