@@ -14,7 +14,7 @@
         android:fitsSystemWindows="true">
 
         <TextView
-            android:id="@+id/textViewLogin11"
+            android:id="@+id/skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="528dp"

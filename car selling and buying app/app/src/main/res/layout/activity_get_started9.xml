@@ -13,19 +13,6 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <TextView
-            android:id="@+id/textViewLogin11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="528dp"
-            android:fontFamily="@font/poppins_regular"
-            android:text="Skip"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/continue1"
             android:layout_width="260dp"

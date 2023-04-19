@@ -3,8 +3,11 @@ package com.example.carsellingandbuyingapp
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -12,15 +15,41 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class GetStarted9 : AppCompatActivity() {
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_get_started9)
 
+        var prev = findViewById<LinearLayout>(R.id.prevLayout)
+
         var continue1 = findViewById<Button>(R.id.continue1)
         val container = findViewById<ConstraintLayout>(R.id.container)
         val slideInRight = AnimationUtils.loadAnimation(this, R.anim.slide_in_right)
-        container.startAnimation(slideInRight)
+        val slideOutRight = AnimationUtils.loadAnimation(this, R.anim.slide_out_right)
+        val slideInLeft = AnimationUtils.loadAnimation(this, R.anim.slide_in_left)
+
+        if (intent.getStringExtra("progressButton") == "prev") {
+            container.startAnimation(slideInLeft)
+        } else {
+            container.startAnimation(slideInRight)
+        }
+
+        prev.setOnClickListener {
+            container.startAnimation(slideOutRight)
+
+            slideOutRight.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {}
+
+                override fun onAnimationEnd(animation: Animation) {
+                    container.visibility = View.GONE
+                    val intent = Intent(this@GetStarted9, GetStarted8::class.java)
+                    intent.putExtra("progressButton", "prev")
+                    startActivity(intent)
+                }
+
+                override fun onAnimationRepeat(animation: Animation) {
+                }
+            })
+        }
 
         completePreferences()
 

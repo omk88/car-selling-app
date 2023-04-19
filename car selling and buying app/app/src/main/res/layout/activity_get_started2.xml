@@ -13,7 +13,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textViewLogin11"
+            android:id="@+id/skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="528dp"
@@ -163,39 +163,6 @@
                 tools:layout_editor_absoluteY="677dp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/prevLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <ImageView
-                android:id="@+id/prevArrow"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:padding="10dp"
-                android:scaleX="-1"
-                app:srcCompat="@drawable/arrow"
-                tools:layout_editor_absoluteX="352dp"
-                tools:layout_editor_absoluteY="677dp" />
-
-            <TextView
-                android:id="@+id/previous"
-                android:layout_width="wrap_content"
-                android:layout_height="38dp"
-                android:fontFamily="@font/poppins_regular"
-                android:gravity="center"
-                android:text="Previous"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.842"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

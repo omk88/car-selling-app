@@ -69,8 +69,6 @@ class VerifyPhone : AppCompatActivity() {
         verify.setOnClickListener {
             if(passcode.text.toString().toInt() == code) {
 
-                println("AAAAAAAAAAAAAA"+username)
-
                 Toast.makeText(this, "Phone Number Verified!", Toast.LENGTH_SHORT).show()
                 val verifyIntent = Intent(this@VerifyPhone, register::class.java)
                 verifyIntent.putExtra("phoneNumber", phoneNumber)
