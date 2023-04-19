@@ -310,7 +310,7 @@
         <activity
             android:name=".VerifyPhone"
             android:exported="true"
-            android:theme="@style/BasicAppCompatTheme">
+            android:theme="@style/Theme.AppCompat.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

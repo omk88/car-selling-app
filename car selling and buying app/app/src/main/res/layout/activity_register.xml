@@ -58,6 +58,7 @@
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 
     <EditText
+        android:focusable="false"
         android:textColor="#803B3B3B"
         android:id="@+id/editTextPhoneNumber"
         android:layout_width="280dp"
@@ -89,7 +90,7 @@
         android:ems="10"
         android:fontFamily="@font/poppins_regular"
         android:hint="E-Mail"
-        android:inputType="phone"
+        android:inputType="textEmailAddress"
         android:maxLines="1"
         android:paddingLeft="15dp"
         android:paddingTop="7.5dp"

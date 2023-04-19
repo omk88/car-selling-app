@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/searchButton3"
+        android:id="@+id/verifyPhone"
         android:layout_width="300dp"
         android:layout_height="30dp"
         android:layout_marginBottom="160dp"
@@ -116,7 +116,7 @@
         android:textCursorDrawable="@drawable/cursor_color"
         android:textSize="20sp"
         android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
-        app:layout_constraintBottom_toTopOf="@+id/searchButton3"
+        app:layout_constraintBottom_toTopOf="@+id/verifyPhone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

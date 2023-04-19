@@ -34,17 +34,42 @@ class register : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
+
+        val editTxt = findViewById<EditText>(R.id.editTextTextPersonName)
+
+        val passTxt = findViewById<EditText>(R.id.editTextTextPassword2)
+
+        val confirmPassTxt = findViewById<EditText>(R.id.editTextTextPassword3)
+
         val phoneTxt = findViewById<EditText>(R.id.editTextPhoneNumber)
 
+        phoneTxt.setText(intent.getStringExtra("phoneNumber"))
+
+        if(intent.getStringExtra("phoneNumber") != null) {
+            phoneTxt.setText(intent.getStringExtra("phoneNumber"))
+            editTxt.setText(intent.getStringExtra("username"))
+            passTxt.setText(intent.getStringExtra("password"))
+            confirmPassTxt.setText(intent.getStringExtra("confirmPassword"))
+        }
+
         phoneTxt.setOnClickListener {
+            val address = customAutocompleteEditText.text.toString()
+            val username = editTxt.text.toString()
+            val password = passTxt.text.toString()
+            val confirmPassword = confirmPassTxt.text.toString()
+
             val intent = Intent(this, VerifyPhone::class.java)
+            intent.putExtra("address", address)
+            intent.putExtra("username", username)
+            intent.putExtra("password", password)
+            intent.putExtra("confirmPassword", confirmPassword)
             startActivity(intent)
             overridePendingTransition(R.anim.slide_in_up, 0)
         }
 
         Places.initialize(applicationContext, "AIzaSyBCTCIpS4t1m9HgmCuUowaoxKSa7vJQShw")
 
-        val customAutocompleteEditText = findViewById<EditText>(R.id.custom_autocomplete_edit_text)
 
         customAutocompleteEditText.setOnClickListener {
             val intent = Autocomplete.IntentBuilder(

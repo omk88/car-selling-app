@@ -120,38 +120,9 @@
                 </RadioGroup>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-        <LinearLayout
-            android:padding="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:id="@+id/next"
-                android:layout_width="wrap_content"
-                android:layout_height="38dp"
-                android:fontFamily="@font/poppins_regular"
-                android:gravity="center"
-                android:text="Next"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.842"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/nextArrow"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:padding="10dp"
-                app:srcCompat="@drawable/arrow"
-                tools:layout_editor_absoluteX="352dp"
-                tools:layout_editor_absoluteY="677dp" />
-        </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/prevLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
