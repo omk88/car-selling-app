@@ -75,14 +75,14 @@
         android:paddingBottom="5.5dp"
         android:textCursorDrawable="@drawable/cursor_color"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextPhoneNumber2"
+        app:layout_constraintBottom_toTopOf="@+id/email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.519"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:textColor="#803B3B3B"
-        android:id="@+id/editTextPhoneNumber2"
+        android:id="@+id/email"
         android:layout_width="280dp"
         android:layout_height="45dp"
         android:layout_marginBottom="16dp"

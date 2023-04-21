@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.telephony.SmsManager
@@ -26,6 +27,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
+import kotlin.random.Random
 
 class register : AppCompatActivity() {
     private val AUTOCOMPLETE_REQUEST_CODE = 1
@@ -104,12 +106,33 @@ class register : AppCompatActivity() {
 
         signUpButton.setOnClickListener{
             addToDatabase()
+
+            //val emailTxt = findViewById<EditText>(R.id.email)
+
+            //val code = Random.nextInt(100_000, 1_000_000)
+
+            //val to = emailTxt.text.toString()
+            //val subject = "AutoXchange Verification"
+            //val message = "Your verification code is "+code
+
+            //sendEmail(to, subject, message)
+
         }
 
         signInButton.setOnClickListener{
             startActivity(Intent(this@register,MainActivity::class.java))
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
         }
+    }
+
+    fun sendEmail(to: String, subject: String, message: String) {
+        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            putExtra(Intent.EXTRA_TEXT, message)
+        }
+        startActivity(Intent.createChooser(emailIntent, "Send email using:"))
     }
 
     fun addToDatabase() {

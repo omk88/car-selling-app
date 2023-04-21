@@ -13,10 +13,15 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val intent = Intent(this, StartConversation::class.java)
+        startActivity(intent)
+        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
 
         val signUpButton = findViewById<TextView>(R.id.signUpNow)
         signUpButton.setOnClickListener{
@@ -35,9 +40,9 @@ class MainActivity : AppCompatActivity() {
         val password = passTxt.text.toString()
 
         database.child(username).get().addOnSuccessListener {
-            if(it.exists()) {
+            if (it.exists()) {
                 val username = it.child("username").value
-                if(password == it.child("password").value) {
+                if (password == it.child("password").value) {
                     val password = it.child("password").value
                     Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
                     val loggedInUser = application as Username
@@ -45,16 +50,22 @@ class MainActivity : AppCompatActivity() {
                     loggedInUser.sales = it.child("sales").value.toString().toInt()
                     loggedInUser.ecoSales = it.child("ecoSales").value.toString().toInt()
 
-                    if(it.child("completedPreferences").value.toString().toInt() == 0) {
+                    if (it.child("completedPreferences").value.toString().toInt() == 0) {
                         val intent = Intent(this, GetStarted::class.java)
-                        intent.putExtra("username",it.child("username").value.toString())
+                        intent.putExtra("username", it.child("username").value.toString())
                         startActivity(intent)
-                        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                        overridePendingTransition(
+                            androidx.appcompat.R.anim.abc_fade_in,
+                            androidx.appcompat.R.anim.abc_fade_out
+                        )
                     } else {
                         val intent = Intent(this, MainPage::class.java)
-                        intent.putExtra("username",it.child("username").value.toString())
+                        intent.putExtra("username", it.child("username").value.toString())
                         startActivity(intent)
-                        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                        overridePendingTransition(
+                            androidx.appcompat.R.anim.abc_fade_in,
+                            androidx.appcompat.R.anim.abc_fade_out
+                        )
                     }
 
                 } else {
@@ -65,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "User Doesn't Exist", Toast.LENGTH_SHORT).show()
             }
-        }.addOnFailureListener{
+        }.addOnFailureListener {
             Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
         }
 

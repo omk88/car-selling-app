@@ -31,16 +31,12 @@ import java.util.ArrayList
 
 class MainPage : AppCompatActivity() {
 
-    lateinit var toggle: ActionBarDrawerToggle
-
     private lateinit var carRecommendationModel: CarRecommendationModel
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
-
-
 
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
@@ -55,8 +51,6 @@ class MainPage : AppCompatActivity() {
 
         val loggedInUser = application as Username
         var username = loggedInUser.username
-
-
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
