@@ -10,18 +10,34 @@
 
 
     <LinearLayout
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <ListView
+            android:id="@+id/messageList"
+            android:layout_width="match_parent"
+            android:layout_height="612dp"
+            android:layout_marginTop="1dp"
+            android:background="@drawable/rounded_corners"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/navBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            app:layout_constraintVertical_bias="1.0" />
 
         <EditText
-            android:textColor="#803B3B3B"
             android:id="@+id/username"
             android:layout_width="280dp"
             android:layout_height="45dp"
@@ -35,6 +51,7 @@
             android:paddingLeft="15dp"
             android:paddingTop="7.5dp"
             android:paddingBottom="5.5dp"
+            android:textColor="#803B3B3B"
             android:textCursorDrawable="@drawable/cursor_color"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword2"
