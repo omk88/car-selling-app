@@ -1,11 +1,13 @@
 package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +19,29 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.math.absoluteValue
+import retrofit2.Call
+import retrofit2.http.GET
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
+interface WorldTimeApiService {
+    @GET("api/ip")
+    fun getCurrentUtcTime(): Call<WorldTimeApiResponse>
+}
+
+data class WorldTimeApiResponse(
+    val utc_datetime: String
+)
+
 
 class Conversation : AppCompatActivity() {
 
@@ -38,7 +61,7 @@ class Conversation : AppCompatActivity() {
 
         val loggedInUser = application as Username
 
-        user = "user4"
+        user = loggedInUser.username
         conversation = user + ":" + intent.getStringExtra("user")
 
         val usernameTextView = findViewById<TextView>(R.id.username)
@@ -85,10 +108,15 @@ class Conversation : AppCompatActivity() {
         val databaseMessages = conversation?.let { database.child(it) }
 
         sendMessage.setOnClickListener {
-            conversation?.let { it1 ->
-                database.child(it1).child(user + "|" + getCurrentDateTime()).setValue(messageText.toString()+":"+"0")
+            messageText = message.text
+
+            getCurrentDateTime { currentDateTimeString ->
+                conversation?.let { it1 ->
+                    database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0")
+                }
             }
         }
+
 
         messageListView = findViewById(R.id.messageList)
         messageAdapter = MessageAdapter(this, ArrayList(), user)
@@ -101,6 +129,7 @@ class Conversation : AppCompatActivity() {
                     var seenMarker = ""
                     var messageText = ""
                     var messageTextAndSeenMarker = snapshot.getValue(String::class.java).toString()
+                    //println("MESSAGE"+messageKey+messageTextAndSeenMarker)
                     if (messageTextAndSeenMarker != null) {
                         messageText = messageTextAndSeenMarker.split(":")[0]
                         seenMarker = messageTextAndSeenMarker.split(":")[1]
@@ -108,7 +137,7 @@ class Conversation : AppCompatActivity() {
 
                     if (messageKey != null && messageTextAndSeenMarker != null) {
                         val messageUser = messageKey.split("|")[0]
-                        val timestamp = messageKey.split("|")[1].toLong()
+                        val timestamp = messageKey.split("|")[1]
 
                         if (messageUser != user && seenMarker == "0") {
                             seenMarker = "1"
@@ -122,6 +151,7 @@ class Conversation : AppCompatActivity() {
 
                         if (!messageAdapter.messageExists(messageKey)) {
                             messageAdapter.add(message)
+                            messageAdapter.notifyDataSetChanged()
                             messageAdapter.sortMessages()
                         }
                     }
@@ -139,20 +169,90 @@ class Conversation : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getCurrentDateTime(): String {
-        val currentDateTime = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-        return currentDateTime.format(formatter)
+    suspend fun getCurrentUtcTimeFromApi(): LocalDateTime {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://worldtimeapi.org/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(WorldTimeApiService::class.java)
+        val response = service.getCurrentUtcTime().execute()
+
+        if (response.isSuccessful) {
+            val result = response.body()
+            if (result != null) {
+                val utcDateTimeString = result.utc_datetime
+                val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                return LocalDateTime.parse(utcDateTimeString, formatter)
+            }
+        }
+        throw Exception("Error getting time from API")
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCurrentDateTime(completionHandler: (String) -> Unit) {
+        val currentDateTime = LocalDateTime.now()
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val utcDateTime = getCurrentUtcTimeFromApi()
+                val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                val currentDateTimeString = utcDateTime.format(formatter)
+                completionHandler(currentDateTimeString)
+            } catch (e: Exception) {
+                Log.e("Conversation", "Error getting time from API: $e")
+            }
+        }
+    }
+
+
 }
 
-class MessageAdapter(context: Context, private val messages: ArrayList<Message>, private val user: String) :
+class MessageAdapter(context: Context, val messages: ArrayList<Message>, private val user: String) :
     ArrayAdapter<Message>(context, R.layout.message_item, messages) {
 
     companion object {
         private const val VIEW_TYPE_MY_MESSAGE = 1
         private const val VIEW_TYPE_OTHER_MESSAGE = 2
     }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getLocalDateTime(timestamp: String): LocalDateTime {
+        val inputDateString = timestamp.toString()
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+        val localDateTime = LocalDateTime.parse(inputDateString, inputFormatter)
+
+        val londonZoneId = ZoneId.of("Europe/London")
+        val zonedDateTime = localDateTime.atZone(ZoneOffset.UTC)
+        val londonZonedDateTime = zonedDateTime.withZoneSameInstant(londonZoneId)
+
+        return londonZonedDateTime.toLocalDateTime()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun sortMessages() {
+        val messageTimestampMap = mutableMapOf<Message, ZonedDateTime>()
+
+        messages.forEach { message ->
+            val inputDateString = message.timestamp
+            val inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+            val utcDateTime = ZonedDateTime.parse(inputDateString.toString(), inputFormatter.withZone(ZoneOffset.UTC))
+
+            messageTimestampMap[message] = utcDateTime
+        }
+
+        val sortedMessages = messageTimestampMap.entries.sortedWith { entry1, entry2 ->
+            entry1.value.compareTo(entry2.value)
+        }.map { it.key }
+
+        messages.clear()
+        messages.addAll(sortedMessages)
+        println("MESSAGESSS" + messages)
+
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
@@ -164,7 +264,7 @@ class MessageAdapter(context: Context, private val messages: ArrayList<Message>,
     }
 
     override fun getViewTypeCount(): Int {
-        return 3 // we have two view types: my message and other's message
+        return 3
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -187,15 +287,11 @@ class MessageAdapter(context: Context, private val messages: ArrayList<Message>,
         }
     }
 
-    fun sortMessages() {
-        messages.sortBy { it.timestamp }
-        notifyDataSetChanged()
-    }
-
     fun messageExists(messageKey: String): Boolean {
         return messages.any { it.messageKey == messageKey }
     }
 }
+
 
 
 

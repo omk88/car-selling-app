@@ -7,10 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AlphaAnimation
-import android.widget.AdapterView
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -51,6 +48,7 @@ class MainPage : AppCompatActivity() {
 
         val loggedInUser = application as Username
         var username = loggedInUser.username
+        Toast.makeText(this, username.toString(), Toast.LENGTH_SHORT).show()
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
