@@ -8,10 +8,32 @@
     android:background="#E7E7E7"
     android:fitsSystemWindows="true">
 
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="50dp"
+        android:text="Welcome to your inbox! Search for a user to start a conversation."
+        android:textColor="#898989"
+        android:textSize="23sp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="49dp" />
 
     <LinearLayout
+        android:background="#E0E0E0"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout23"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
@@ -22,12 +44,74 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="9"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="3dp">
+
+                <EditText
+                    android:id="@+id/username"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/edit_text_background"
+                    android:ems="10"
+                    android:fontFamily="@font/poppins_regular"
+                    android:hint="Type a username..."
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingLeft="15dp"
+                    android:paddingTop="7.5dp"
+                    android:paddingBottom="5.5dp"
+                    android:textColor="#803B3B3B"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.519"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.3"
+                android:orientation="horizontal"
+                android:paddingLeft="3dp"
+                android:paddingRight="3dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/startConversation"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginBottom="64dp"
+                    android:background="@drawable/button_background"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text=">"
+                    android:textColor="#36454F"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.519"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </LinearLayout>
+        </LinearLayout>
+
         <ListView
             android:id="@+id/messageList"
             android:layout_width="match_parent"
             android:layout_height="612dp"
             android:layout_marginTop="1dp"
-            android:background="@drawable/rounded_corners"
             android:divider="@null"
             android:dividerHeight="0dp"
             app:layout_constraintBottom_toTopOf="@+id/navBar"
@@ -37,43 +121,21 @@
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             app:layout_constraintVertical_bias="1.0" />
 
-        <EditText
-            android:id="@+id/username"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:fontFamily="@font/poppins_regular"
-            android:hint="Username"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingLeft="15dp"
-            android:paddingTop="7.5dp"
-            android:paddingBottom="5.5dp"
-            android:textColor="#803B3B3B"
-            android:textCursorDrawable="@drawable/cursor_color"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.519"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/startConversation"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="64dp"
-            android:background="@drawable/button_background"
-            android:fontFamily="@font/poppins_regular"
-            android:text="Start Conversation"
-            android:textColor="#36454F"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.519"
-            app:layout_constraintStart_toStartOf="parent" />
-
     </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu"
+        android:background="@color/white"
+        app:itemIconTint="#A6A09F"
+        app:itemTextColor="#A6A09F"
+        app:labelVisibilityMode="labeled" >
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -89,6 +89,12 @@ class MainPage : AppCompatActivity() {
                     overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
                     true
                 }
+                R.id.messages -> {
+                    val intent = Intent(this@MainPage, StartConversation::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
                 else -> false
             }
         }

@@ -1,17 +1,15 @@
 package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.ChildEventListener
@@ -43,7 +41,15 @@ class Conversation : AppCompatActivity() {
         user = "user4"
         conversation = user + ":" + intent.getStringExtra("user")
 
+        val usernameTextView = findViewById<TextView>(R.id.username)
+        usernameTextView.setText(intent.getStringExtra("user"))
 
+        val backArrow = findViewById<ImageView>(R.id.backArrow)
+        backArrow.setOnClickListener {
+            val convIntent = Intent(this, StartConversation::class.java)
+            startActivity(convIntent)
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+        }
 
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -80,7 +86,7 @@ class Conversation : AppCompatActivity() {
 
         sendMessage.setOnClickListener {
             conversation?.let { it1 ->
-                database.child(it1).child(user + "|" + getCurrentDateTime()).setValue(messageText.toString())
+                database.child(it1).child(user + "|" + getCurrentDateTime()).setValue(messageText.toString()+":"+"0")
             }
         }
 
@@ -92,17 +98,34 @@ class Conversation : AppCompatActivity() {
             databaseMessages.addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     val messageKey = snapshot.key
-                    val messageText = snapshot.getValue(String::class.java)
-                    if (messageKey != null && messageText != null) {
+                    var seenMarker = ""
+                    var messageText = ""
+                    var messageTextAndSeenMarker = snapshot.getValue(String::class.java).toString()
+                    if (messageTextAndSeenMarker != null) {
+                        messageText = messageTextAndSeenMarker.split(":")[0]
+                        seenMarker = messageTextAndSeenMarker.split(":")[1]
+                    }
+
+                    if (messageKey != null && messageTextAndSeenMarker != null) {
                         val messageUser = messageKey.split("|")[0]
                         val timestamp = messageKey.split("|")[1].toLong()
+
+                        if (messageUser != user && seenMarker == "0") {
+                            seenMarker = "1"
+                            messageTextAndSeenMarker = messageText + ":" + seenMarker
+                            conversation?.let { it1 ->
+                                database.child(it1).child(messageKey).setValue(messageTextAndSeenMarker)
+                            }
+                        }
+
                         val message = Message(messageUser, messageText, timestamp)
-                        messageAdapter.add(message)
-                        messageAdapter.sortMessages()
+
+                        if (!messageAdapter.messageExists(messageKey)) {
+                            messageAdapter.add(message)
+                            messageAdapter.sortMessages()
+                        }
                     }
                 }
-
-
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
@@ -169,6 +192,9 @@ class MessageAdapter(context: Context, private val messages: ArrayList<Message>,
         notifyDataSetChanged()
     }
 
+    fun messageExists(messageKey: String): Boolean {
+        return messages.any { it.messageKey == messageKey }
+    }
 }
 
 

@@ -30,7 +30,7 @@
             <ImageView
                 android:scaleX="-1"
                 android:padding="17dp"
-                android:id="@+id/imageView12"
+                android:id="@+id/backArrow"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/arrow" />

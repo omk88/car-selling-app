@@ -19,10 +19,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val intent = Intent(this, StartConversation::class.java)
-        startActivity(intent)
-        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
-
         val signUpButton = findViewById<TextView>(R.id.signUpNow)
         signUpButton.setOnClickListener{
             startActivity(Intent(this@MainActivity,register::class.java))

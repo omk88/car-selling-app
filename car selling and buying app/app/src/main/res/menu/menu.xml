@@ -17,8 +17,8 @@
         android:icon="@drawable/ic_sell"
         android:title="Sell Car"/>
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_baseline_settings_24"
-        android:title="Settings"/>
+        android:id="@+id/messages"
+        android:icon="@drawable/ic_mail"
+        android:title="Messages"/>
 
 </menu>
