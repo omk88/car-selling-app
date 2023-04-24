@@ -101,17 +101,13 @@ class MainPage : AppCompatActivity() {
             bannerUri = getImageUriFromBytes(bytes)
             loggedInUser.bannerUri = bannerUri.toString()
             username?.let {}
-        }.addOnFailureListener { exception ->
-            // handle error
-        }
+        }.addOnFailureListener { exception -> }
 
         profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
             profilePictureUri = getImageUriFromBytes(bytes)
             loggedInUser.profilePictureUri = profilePictureUri.toString()
             username?.let {}
-        }.addOnFailureListener { exception ->
-            // handle error
-        }
+        }.addOnFailureListener { exception -> }
 
         carRecommendationModel = CarRecommendationModel(this)
 

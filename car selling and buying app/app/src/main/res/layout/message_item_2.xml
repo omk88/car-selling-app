@@ -29,6 +29,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:maxEms="12"
                 android:fontFamily="@font/poppins_regular"
                 android:gravity="top"
                 android:text="Hello my name is user4 and I am interested in purchasing a car!"
@@ -36,6 +37,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_gravity="top|right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/timeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="17:24"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </LinearLayout>
