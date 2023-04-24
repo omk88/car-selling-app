@@ -310,6 +310,7 @@
                 android:value="" />
         </activity>
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".StartConversation"
             android:exported="true"
             android:theme="@style/BasicAppCompatTheme">

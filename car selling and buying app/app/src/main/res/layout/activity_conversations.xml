@@ -8,6 +8,17 @@
     android:background="#E7E7E7"
     android:fitsSystemWindows="true">
 
+    <FrameLayout
+        android:id="@+id/dummy_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/welcome"
         android:layout_width="match_parent"
@@ -28,6 +39,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 
 
     <LinearLayout
@@ -52,11 +65,25 @@
             android:padding="6dp">
 
             <LinearLayout
+                android:id="@+id/close"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:id="@+id/imageView8"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/close" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="9"
                 android:orientation="horizontal"
-                android:paddingLeft="10dp"
                 android:paddingRight="3dp">
 
                 <EditText
@@ -82,29 +109,7 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.3"
-                android:orientation="horizontal"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/startConversation"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:layout_marginBottom="64dp"
-                    android:background="@drawable/button_background"
-                    android:fontFamily="@font/poppins_regular"
-                    android:text=">"
-                    android:textColor="#36454F"
-                    android:textSize="16sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.519"
-                    app:layout_constraintStart_toStartOf="parent" />
-            </LinearLayout>
         </LinearLayout>
 
         <ListView
@@ -121,21 +126,44 @@
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             app:layout_constraintVertical_bias="1.0" />
 
+        <ListView
+            android:id="@+id/messageList2"
+            android:layout_width="match_parent"
+            android:layout_height="612dp"
+            android:layout_marginTop="1dp"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/navBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.333"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            app:layout_constraintVertical_bias="1.0" />
+
+
     </LinearLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/navBar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu"
-        android:background="@color/white"
-        app:itemIconTint="#A6A09F"
-        app:itemTextColor="#A6A09F"
-        app:labelVisibilityMode="labeled" >
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:layout_gravity="bottom"
+            android:id="@+id/navBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/menu"
+            android:background="@color/white"
+            app:itemIconTint="#A6A09F"
+            app:itemTextColor="#A6A09F"
+            app:labelVisibilityMode="labeled" >
+
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

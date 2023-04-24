@@ -500,7 +500,6 @@ open class OnSwipeTouchListener(ctx: Context, private val listView: ListView, pr
             listView.setOnTouchListener { _, _ -> true }
         }
     }
-
 }
 
 
