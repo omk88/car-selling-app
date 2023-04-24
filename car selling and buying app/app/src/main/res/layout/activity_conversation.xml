@@ -105,10 +105,11 @@
                 android:paddingRight="3dp">
 
                 <androidx.cardview.widget.CardView
+                    app:cardElevation="0dp"
                     android:layout_marginBottom="5dp"
                     android:gravity="left"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
                     app:cardBackgroundColor="#f5f7fa"
                     app:cardCornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -119,19 +120,41 @@
                     <LinearLayout
                         android:padding="8dp"
                         android:layout_gravity="center"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
 
                         <TextView
+                            android:layout_weight="10"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:paddingTop="3dp"
+                            android:paddingBottom="3dp"
+                            android:background="@drawable/reply_message_background"
                             android:maxEms="12"
                             android:fontFamily="@font/poppins_regular"
                             android:gravity="top"
                             android:text="Hello my name is user4 and I am interested in purchasing a car!"
-                            android:id="@+id/messageTextView"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/replyText"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:padding="3dp"
+                                android:id="@+id/close"
+                                android:layout_width="match_parent"
+                                android:layout_height="15dp"
+                                app:srcCompat="@drawable/close" />
+
+                        </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 

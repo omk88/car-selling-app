@@ -1,7 +1,6 @@
 package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
-import java.time.temporal.ChronoUnit
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -23,7 +22,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.time.format.DateTimeFormatter
-import kotlin.math.absoluteValue
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.Retrofit
@@ -31,12 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
 import java.time.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.abs
 
 interface WorldTimeApiService {
     @GET("api/ip")
@@ -57,6 +52,11 @@ class Conversation : AppCompatActivity() {
     private lateinit var sendMessage: Button
     private lateinit var message: EditText
     private lateinit var messageText: CharSequence
+    lateinit var cardView: CardView
+    lateinit var close: ImageView
+    lateinit var replyText: TextView
+    var swipedMessageText: CharSequence = ""
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -66,8 +66,11 @@ class Conversation : AppCompatActivity() {
 
         val loggedInUser = application as Username
 
-        val cardView = findViewById<CardView>(R.id.cardView)
+        cardView = findViewById(R.id.cardView)
         cardView.visibility = View.GONE
+
+        close = findViewById(R.id.close)
+        replyText = findViewById(R.id.replyText)
 
         user = loggedInUser.username
         conversation = user + ":" + intent.getStringExtra("user")
@@ -118,17 +121,27 @@ class Conversation : AppCompatActivity() {
         sendMessage.setOnClickListener {
             messageText = message.text
 
-            getCurrentDateTime { currentDateTimeString ->
-                conversation?.let { it1 ->
-                    database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0")
+            if(messageText != "") {
+                if (cardView.visibility == View.GONE) {
+                    getCurrentDateTime { currentDateTimeString ->
+                        conversation?.let { it1 ->
+                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0")
+                        }
+                    }
+                    message.setText("")
+                } else {
+                    getCurrentDateTime { currentDateTimeString ->
+                        conversation?.let { it1 ->
+                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString())
+                        }
+                    }
                 }
             }
-            message.setText("")
         }
 
 
         messageListView = findViewById(R.id.messageList)
-        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView)
+        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView, this)
         messageListView.adapter = messageAdapter
 
         if (databaseMessages != null) {
@@ -137,15 +150,22 @@ class Conversation : AppCompatActivity() {
                     val messageKey = snapshot.key
                     var seenMarker = ""
                     var messageText = ""
+                    var replyText = ""
                     var messageTextAndSeenMarker = snapshot.getValue(String::class.java).toString()
                     if (messageTextAndSeenMarker != null) {
                         messageText = messageTextAndSeenMarker.split(":")[0]
                         seenMarker = messageTextAndSeenMarker.split(":")[1]
+                        if(messageTextAndSeenMarker.contains("REPLY_TO", ignoreCase = false)) {
+                            replyText =  messageTextAndSeenMarker.split(":")[3]
+                        }
                     }
 
                     if (messageKey != null && messageTextAndSeenMarker != null) {
                         val messageUser = messageKey.split("|")[0]
                         val timestamp = messageKey.split("|")[1]
+                        if(messageTextAndSeenMarker.contains("REPLY_TO", ignoreCase = false)) {
+                            replyText =  messageTextAndSeenMarker.split(":")[3]
+                        }
 
                         if (messageUser != user && seenMarker == "0") {
                             seenMarker = "1"
@@ -155,7 +175,7 @@ class Conversation : AppCompatActivity() {
                             }
                         }
 
-                        val message = Message(messageUser, messageText, timestamp, seenMarker)
+                        val message = Message(messageUser, messageText, timestamp, seenMarker, replyText)
 
                         if (!messageAdapter.messageExists(messageKey)) {
                             messageAdapter.add(message)
@@ -224,12 +244,14 @@ class Conversation : AppCompatActivity() {
 
 }
 
-class MessageAdapter(context: Context, val messages: ArrayList<Message>, private val user: String, private val messageListView: ListView) :
+class MessageAdapter(context: Context, val messages: ArrayList<Message>, private val user: String, private val messageListView: ListView, private val conversation: Conversation) :
     ArrayAdapter<Message>(context, R.layout.message_item, messages) {
 
     companion object {
         private const val VIEW_TYPE_MY_MESSAGE = 1
         private const val VIEW_TYPE_OTHER_MESSAGE = 2
+        private const val VIEW_TYPE_MY_REPLY = 3
+        private const val VIEW_TYPE_OTHER_REPLY = 4
     }
 
     fun scrollToBottom() {
@@ -277,15 +299,23 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        return if (message.user == user) {
-            VIEW_TYPE_MY_MESSAGE
+        return if ((message.user == user) && (message.replyText != null)) {
+            if (message.replyText != "") {
+                VIEW_TYPE_MY_REPLY
+            } else {
+                VIEW_TYPE_MY_MESSAGE
+            }
         } else {
-            VIEW_TYPE_OTHER_MESSAGE
+            if ((message.replyText != "") && (message.replyText != null)) {
+                VIEW_TYPE_OTHER_REPLY
+            } else {
+                VIEW_TYPE_OTHER_MESSAGE
+            }
         }
     }
 
     override fun getViewTypeCount(): Int {
-        return 3
+        return 5
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -315,22 +345,69 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 messageTextView.text = messages[position].text
                 view.startAnimation(fadeInAnimation)
                 view
+            } VIEW_TYPE_MY_REPLY -> {
+                val view = convertView ?: inflater.inflate(R.layout.reply_item, parent, false)
+                val seenMarker = view.findViewById<ImageView>(R.id.seen)
+                if (messages[position].seen != "1") {
+                    seenMarker.visibility = View.GONE
+                }
+                val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
+                val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
+                val replyingTo = view.findViewById<TextView>(R.id.replyText)
+
+                val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                val outputFormat = DateTimeFormatter.ofPattern("HH:mm")
+
+                val utcDateTime = LocalDateTime.parse(messages[position].timestamp, inputFormat).atZone(ZoneOffset.UTC)
+                val localDateTime = utcDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+                val formattedTime = localDateTime.format(outputFormat)
+
+                timeTextView.text = formattedTime
+                messageTextView.text = messages[position].text
+                replyingTo.text = messages[position].replyText
+
+                view.startAnimation(fadeInAnimation)
+                view
+            } VIEW_TYPE_OTHER_REPLY -> {
+                val view = convertView ?: inflater.inflate(R.layout.reply_item2, parent, false)
+                val seenMarker = view.findViewById<ImageView>(R.id.seen)
+                if (messages[position].seen != "1") {
+                    seenMarker.visibility = View.GONE
+                }
+                val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
+                val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
+                val replyingTo = view.findViewById<TextView>(R.id.replyText)
+
+                val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
+                val outputFormat = DateTimeFormatter.ofPattern("HH:mm")
+
+                val utcDateTime = LocalDateTime.parse(messages[position].timestamp, inputFormat).atZone(ZoneOffset.UTC)
+                val localDateTime = utcDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+                val formattedTime = localDateTime.format(outputFormat)
+
+                timeTextView.text = formattedTime
+                messageTextView.text = messages[position].text
+                replyingTo.text = messages[position].replyText
+
+                view.startAnimation(fadeInAnimation)
+                view
             }
             else -> {
                 val view = convertView ?: inflater.inflate(R.layout.message_item_2, parent, false)
                 val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
                 val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
 
-                view.setOnTouchListener(object : OnSwipeTouchListener(context, messageListView, context as Conversation) {
+                view.setOnTouchListener(object : OnSwipeTouchListener(context, messageListView, context as Conversation, view) {
                     override fun onSwipeRight() {
                         super.onSwipeRight()
-                        // Trigger reply function here
                         //(context as Conversation).triggerReplyFunction(messages[position])
                     }
 
-                    fun onMessageReachedMiddle(view: View) {
+                    init {
+                        (context as Conversation).swipedMessageText = messageTextView.text
                     }
                 })
+
 
 
                 val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
@@ -361,7 +438,12 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
 
 }
 
-open class OnSwipeTouchListener(ctx: Context, private val listView: ListView, private val conversation: Conversation) : View.OnTouchListener {
+open class OnSwipeTouchListener(
+    ctx: Context,
+    private val listView: ListView,
+    private val conversation: Conversation,
+    private val replyMessage: View
+) : View.OnTouchListener {
     private val gestureDetector: GestureDetector
     private var initialX: Float = 0f
     private var initialTouchX: Float = 0f
@@ -394,6 +476,12 @@ open class OnSwipeTouchListener(ctx: Context, private val listView: ListView, pr
                         messageReachedMiddle = true
                         onMessageReachedMiddle()
                     }
+                    if (!messageReachedMiddle && newX >= (screenWidth / 10) - marginOfError) {
+                        val replyText = conversation.replyText
+                        replyText.text = replyMessage.findViewById<TextView>(R.id.messageTextView).text.toString()
+                        vibratePhone(context)
+                    }
+
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
@@ -406,13 +494,20 @@ open class OnSwipeTouchListener(ctx: Context, private val listView: ListView, pr
     }
 
     open fun onMessageReachedMiddle() {
-        val cardView = conversation.findViewById<CardView>(R.id.cardView)
+        val cardView = conversation.cardView
         cardView.visibility = View.VISIBLE
-        vibratePhone(context)
+        val close = conversation.close
+
+        close.setOnClickListener {
+            cardView.visibility = View.GONE
+        }
+
         val message = conversation.findViewById<EditText>(R.id.message)
-        scrollToBottom()
         showKeyboardAndFocusEditText(context, message)
     }
+
+
+
 
     fun scrollToBottom() {
         val adapter = listView.adapter
@@ -431,11 +526,11 @@ open class OnSwipeTouchListener(ctx: Context, private val listView: ListView, pr
 
         if (vibrator.hasVibrator()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val vibrationEffect = VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE)
+                val vibrationEffect = VibrationEffect.createOneShot(10, VibrationEffect.DEFAULT_AMPLITUDE)
                 vibrator.vibrate(vibrationEffect)
             } else {
                 @Suppress("DEPRECATION")
-                vibrator.vibrate(200)
+                vibrator.vibrate(10)
             }
         }
     }

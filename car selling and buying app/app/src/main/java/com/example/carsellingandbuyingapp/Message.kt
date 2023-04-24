@@ -4,7 +4,9 @@ data class Message(
     val user: String,
     val text: String,
     val timestamp: String,
-    val seen: String){
+    val seen: String,
+    val replyText: String
+){
 
     val messageKey = "$user|$timestamp"
 }
