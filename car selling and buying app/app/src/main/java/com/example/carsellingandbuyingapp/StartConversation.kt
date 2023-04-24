@@ -25,11 +25,17 @@ class StartConversation : AppCompatActivity() {
     private lateinit var usernamesAdapter: UsernamesAdapter
     private lateinit var conversationListView: ListView
     private lateinit var usernamesListView: ListView
+    private val conversationIndexMap = HashMap<String, Int>()
+    private lateinit var welcomeTextView: TextView
+
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversations)
+
+        welcomeTextView = findViewById(R.id.welcome)
 
         val loggedInUser = application as Username
 
@@ -68,7 +74,7 @@ class StartConversation : AppCompatActivity() {
                 conversationListView.visibility = View.VISIBLE
                 usernamesListView.visibility = View.GONE
                 close.visibility = View.GONE
-                hideKeyboard()
+                hideKeyboard(username)
             }
         }
         //val startConversation = findViewById<Button>(R.id.startConversation)
@@ -76,7 +82,7 @@ class StartConversation : AppCompatActivity() {
         val databaseConversation = Firebase.database.getReference("conversations")
 
         conversationListView = findViewById(R.id.messageList)
-        conversationAdapter = ConversationAdapter(this, ArrayList())
+        conversationAdapter = ConversationAdapter(this, ArrayList(), welcomeTextView)
         conversationListView.adapter = conversationAdapter
 
         usernamesListView.visibility = View.GONE
@@ -87,7 +93,8 @@ class StartConversation : AppCompatActivity() {
 
         databaseConversation.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val conversationKey = snapshot.key
+                val conversationKey = snapshot.key ?: return
+
                 var lastMessage = ""
                 var messagesCount = 0
 
@@ -104,29 +111,46 @@ class StartConversation : AppCompatActivity() {
                     }
                 }
 
-                conversationKey?.let {
-                    val firstUser = it.split(":")[0]
-                    val secondUser = it.split(":")[1]
+                val index = conversationAdapter.count
+                conversationIndexMap[conversationKey] = index
 
-                    val welcome = findViewById<TextView>(R.id.welcome)
+                val firstUser = conversationKey.split(":")[0]
+                val secondUser = conversationKey.split(":")[1]
+                val targetUsername = if (loggedInUser.username == firstUser) secondUser else firstUser
 
-                    if (loggedInUser.username == firstUser) {
-                        conversationAdapter.add(secondUser)
-                        welcome.visibility = View.GONE
-                        conversationAdapter.addLastMessage(lastMessage)
-                        conversationAdapter.addMessageCount(messagesCount)
-                        conversationAdapter.notifyDataSetChanged()
-                    } else if (loggedInUser.username == secondUser) {
-                        conversationAdapter.add(firstUser)
-                        welcome.visibility = View.GONE
-                        conversationAdapter.addLastMessage(lastMessage)
-                        conversationAdapter.addMessageCount(messagesCount)
-                        conversationAdapter.notifyDataSetChanged()
-                    }
-                }
+                conversationAdapter.removeByUsername(targetUsername)
+                conversationAdapter.add(targetUsername)
+                conversationAdapter.addLastMessage(lastMessage)
+                conversationAdapter.addMessageCount(messagesCount)
+                conversationAdapter.notifyDataSetChanged()
             }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val conversationKey = snapshot.key ?: return
+
+                var lastMessage = ""
+                var messagesCount = 0
+
+                for (messageSnapshot in snapshot.children) {
+                    val messageData = messageSnapshot.key ?: continue
+                    val message = messageSnapshot.getValue(String::class.java) ?: continue
+                    val sender = messageData.split("|")[0]
+                    val parts = message.split(":")
+                    if (parts.size == 2) {
+                        lastMessage = parts[0]
+                        if (parts[1] == "0" && sender != loggedInUser.username) {
+                            messagesCount += 1
+                        }
+                    }
+                }
+
+                val index = conversationIndexMap[conversationKey] ?: return
+                updateConversation(conversationKey, loggedInUser, index, lastMessage, messagesCount)
+                conversationAdapter.notifyDataSetChanged()
+            }
+
+
 
             override fun onChildRemoved(snapshot: DataSnapshot) {}
 
@@ -142,10 +166,34 @@ class StartConversation : AppCompatActivity() {
         }*/
     }
 
-    private fun hideKeyboard() {
+    private fun hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+
+    private fun updateConversation(conversationKey: String, loggedInUser: Username, index: Int, lastMessage: String, messagesCount: Int) {
+        val firstUser = conversationKey.split(":")[0]
+        val secondUser = conversationKey.split(":")[1]
+
+        val targetUsername = if (loggedInUser.username == firstUser) secondUser else firstUser
+
+        if (conversationIndexMap.containsKey(conversationKey)) {
+            conversationAdapter.update(conversationIndexMap[conversationKey]!!, targetUsername, lastMessage, messagesCount)
+        } else {
+            conversationAdapter.removeByUsername(targetUsername)
+            conversationAdapter.add(targetUsername)
+            conversationAdapter.addLastMessage(lastMessage)
+            conversationAdapter.addMessageCount(messagesCount)
+            conversationAdapter.notifyDataSetChanged()
+
+            val newIndex = conversationAdapter.count - 1
+            conversationIndexMap[conversationKey] = newIndex
+        }
+    }
+
+
+
 
 
     fun getUsernames() {
@@ -176,11 +224,29 @@ class StartConversation : AppCompatActivity() {
 
 }
 
-class ConversationAdapter(context: Context, private val messages: ArrayList<String>) :
+class ConversationAdapter(context: Context, private val messages: ArrayList<String>, private val welcomeTextView: TextView) :
     ArrayAdapter<String>(context, R.layout.user_item, messages) {
 
     private val currentMessages = ArrayList<String>()
     private val messageCounts = ArrayList<Int>()
+
+    fun removeByUsername(username: String) {
+        val index = messages.indexOf(username)
+        if (index != -1) {
+            messages.removeAt(index)
+            currentMessages.removeAt(index)
+            messageCounts.removeAt(index)
+        }
+    }
+
+    fun truncateText(text: String, maxLength: Int): String {
+        return if (text.length <= maxLength) {
+            text
+        } else {
+            text.substring(0, maxLength) + "..."
+        }
+    }
+
 
     fun addLastMessage(message: String) {
         currentMessages.add(message)
@@ -190,7 +256,24 @@ class ConversationAdapter(context: Context, private val messages: ArrayList<Stri
         messageCounts.add(count)
     }
 
+    fun update(index: Int, username: String, lastMessage: String, messagesCount: Int) {
+        if (index < count) {
+            messages[index] = username
+            currentMessages[index] = lastMessage
+            messageCounts[index] = messagesCount
+        } else {
+            messages.add(username)
+            currentMessages.add(lastMessage)
+            messageCounts.add(messagesCount)
+        }
+        notifyDataSetChanged()
+    }
+
+
+
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        welcomeTextView.visibility = if (isEmpty) View.VISIBLE else View.GONE
         val inflater = LayoutInflater.from(context)
         val view = convertView ?: inflater.inflate(R.layout.user_item, parent, false)
 
@@ -203,9 +286,12 @@ class ConversationAdapter(context: Context, private val messages: ArrayList<Stri
 
         if (messageCounts[position] == 0) {
             unseenMessages.visibility = View.GONE
+        } else {
+            unseenMessages.visibility = View.VISIBLE
+            messagesCountTextView.text = messageCounts[position].toString()
         }
 
-        currentMessageTextView.text = currentMessages[position]
+        currentMessageTextView.text = truncateText(currentMessages[position], 15)
 
         messageTextView.text = messages[position]
 

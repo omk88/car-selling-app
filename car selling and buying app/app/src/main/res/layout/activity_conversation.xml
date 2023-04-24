@@ -137,16 +137,17 @@
 
 
                 <EditText
+                    android:maxLines="7"
+                    android:inputType="textMultiLine"
+                    android:scrollbars="vertical"
                     android:gravity="center_vertical"
                     android:id="@+id/message"
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/edit_text_background"
-                    android:ems="10"
+                    android:ems="5"
                     android:fontFamily="@font/poppins_regular"
                     android:hint="Message"
-                    android:inputType="text"
-                    android:maxLines="1"
                     android:paddingLeft="15dp"
                     android:paddingTop="7.5dp"
                     android:paddingBottom="5.5dp"
