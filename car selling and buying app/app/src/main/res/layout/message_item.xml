@@ -28,6 +28,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <ImageView
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:id="@+id/sentImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_weight="10"
+                app:srcCompat="@drawable/selectimage" />
+
             <TextView
                 android:layout_marginBottom="8dp"
                 android:layout_weight="10"

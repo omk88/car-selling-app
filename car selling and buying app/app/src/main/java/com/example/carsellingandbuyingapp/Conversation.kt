@@ -1,9 +1,12 @@
 package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -29,6 +32,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.time.format.DateTimeFormatter
@@ -39,9 +43,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.SecureRandom
 import java.time.*
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 import kotlin.collections.ArrayList
 
 interface WorldTimeApiService {
@@ -69,7 +80,9 @@ class Conversation : AppCompatActivity() {
     lateinit var replyText: TextView
     var swipedMessageText: CharSequence = ""
     private var RESULT_LOAD_IMAGE: Int = 1
-
+    var imageLocation: String = ""
+    lateinit var attachImage: ImageView
+    var imageUri: Uri? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -177,16 +190,39 @@ class Conversation : AppCompatActivity() {
 
             if(messageText != "") {
                 if (cardView.visibility == View.GONE) {
-                    getCurrentDateTime { currentDateTimeString ->
-                        conversation?.let { it1 ->
-                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + "")
+                    if (cardView2.visibility != View.GONE) {
+                        val randomString = uploadImage()
+                        getCurrentDateTime { currentDateTimeString ->
+                            conversation?.let { it1 ->
+                                database.child(it1).child(user + "|" + currentDateTimeString)
+                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + "" + ":" + "IMAGE_SHOWN" + ":" + randomString)
+                            }
                         }
+                        message.setText("")
+                    } else {
+                        getCurrentDateTime { currentDateTimeString ->
+                            conversation?.let { it1 ->
+                                database.child(it1).child(user + "|" + currentDateTimeString)
+                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + ""  + ":" +  "IMAGE_SHOWN" + ":")
+                            }
+                        }
+                        message.setText("")
                     }
-                    message.setText("")
                 } else {
-                    getCurrentDateTime { currentDateTimeString ->
-                        conversation?.let { it1 ->
-                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString())
+                    if (cardView2.visibility != View.GONE) {
+                        val randomString = uploadImage()
+                        getCurrentDateTime { currentDateTimeString ->
+                            conversation?.let { it1 ->
+                                database.child(it1).child(user + "|" + currentDateTimeString)
+                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":" + randomString)
+                            }
+                        }
+                    } else {
+                        getCurrentDateTime { currentDateTimeString ->
+                            conversation?.let { it1 ->
+                                database.child(it1).child(user + "|" + currentDateTimeString)
+                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":")
+                            }
                         }
                     }
                 }
@@ -195,7 +231,7 @@ class Conversation : AppCompatActivity() {
 
 
         messageListView = findViewById(R.id.messageList)
-        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView, this)
+        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView, this, imageLocation)
         messageListView.adapter = messageAdapter
 
         if (databaseMessages != null) {
@@ -205,12 +241,17 @@ class Conversation : AppCompatActivity() {
                     var seenMarker = ""
                     var messageText = ""
                     var replyText = ""
+                    var imageMessageLocation = ""
                     var messageTextAndSeenMarker = snapshot.getValue(String::class.java).toString()
                     if (messageTextAndSeenMarker != null) {
                         messageText = messageTextAndSeenMarker.split(":")[0]
                         seenMarker = messageTextAndSeenMarker.split(":")[1]
                         if(messageTextAndSeenMarker.contains("REPLY_TO", ignoreCase = false)) {
                             replyText =  messageTextAndSeenMarker.split(":")[3]
+                        }
+
+                        if(messageTextAndSeenMarker.contains("IMAGE_SHOWN", ignoreCase = false)) {
+                            imageMessageLocation =  messageTextAndSeenMarker.split(":")[5]
                         }
                     }
 
@@ -221,15 +262,19 @@ class Conversation : AppCompatActivity() {
                             replyText =  messageTextAndSeenMarker.split(":")[3]
                         }
 
+                        if(messageTextAndSeenMarker.contains("IMAGE_SHOWN", ignoreCase = false)) {
+                            imageMessageLocation =  messageTextAndSeenMarker.split(":")[5]
+                        }
+
                         if (messageUser != user && seenMarker == "0") {
                             seenMarker = "1"
-                            messageTextAndSeenMarker = messageText + ":" + seenMarker + ":" + "REPLY_TO" + ":" + replyText
+                            messageTextAndSeenMarker = messageText + ":" + seenMarker + ":" + "REPLY_TO" + ":" + replyText + ":" + "IMAGE_SHOWN" + ":" + imageMessageLocation
                             conversation?.let { it1 ->
                                 database.child(it1).child(messageKey).setValue(messageTextAndSeenMarker)
                             }
                         }
 
-                        val message = Message(messageUser, messageText, timestamp, seenMarker, replyText)
+                        val message = Message(messageUser, messageText, timestamp, seenMarker, replyText, imageMessageLocation)
 
                         if (!messageAdapter.messageExists(messageKey)) {
                             messageAdapter.add(message)
@@ -296,21 +341,100 @@ class Conversation : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == RESULT_LOAD_IMAGE && data != null) {
 
-            val attachImage = findViewById<ImageView>(R.id.attachedImage)
-            val imageUri = data?.data
+            attachImage = findViewById(R.id.attachedImage)
+            imageUri = data?.data
+            imageLocation = imageUri.toString()
             attachImage.setImageURI(imageUri)
             cardView2.visibility = View.VISIBLE
 
         }
     }
 
+    private fun compressAndResizeImage(uri: Uri?): ByteArray {
+        if (uri == null) {
+            throw IllegalArgumentException("Uri cannot be null")
+        }
 
+        val compressedImage = compressImage(uri, contentResolver)
+        val bitmap = BitmapFactory.decodeByteArray(compressedImage, 0, compressedImage.size)
+        val resizedBitmap = resizeImage(bitmap, maxWidth = 800, maxHeight = 800)
 
+        val outputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
+        return outputStream.toByteArray()
+    }
 
+    private fun compressImage(uri: Uri, contentResolver: ContentResolver, quality: Int = 75): ByteArray {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+        return outputStream.toByteArray()
+    }
 
+    private fun resizeImage(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val ratioBitmap = width.toFloat() / height.toFloat()
+        val ratioMax = maxWidth.toFloat() / maxHeight.toFloat()
+
+        var finalWidth = maxWidth
+        var finalHeight = maxHeight
+        if (ratioMax > ratioBitmap) {
+            finalWidth = (maxHeight.toFloat() * ratioBitmap).toInt()
+        } else {
+            finalHeight = (maxWidth.toFloat() / ratioBitmap).toInt()
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, finalWidth, finalHeight, true)
+    }
+
+    private fun uploadImage(): String {
+        val randomString = generateRandomString(10)
+        var storageRef = Firebase.storage.reference
+        var pd = ProgressDialog(this@Conversation)
+        pd.setTitle("Sending Image...")
+        pd.show()
+
+        val image0 = storageRef.child("images/$randomString")
+
+        val uris = arrayOf(imageUri)
+        val images = arrayOf(image0)
+
+        for (i in 0..0) {
+            uris[i]?.let { uri ->
+                val compressedAndResizedImage = compressAndResizeImage(uri)
+                val uploadTask = images[i].putBytes(compressedAndResizedImage)
+
+                uploadTask.addOnSuccessListener {
+                    images[i].downloadUrl.addOnSuccessListener { _ ->
+                        pd.dismiss()
+                    }
+                }.addOnFailureListener { exception ->
+                    Toast.makeText(applicationContext, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        return randomString
+    }
+
+    fun generateRandomString(length: Int): String {
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return (1..length)
+            .map { allowedChars.random() }
+            .joinToString("")
+    }
 }
 
-class MessageAdapter(context: Context, val messages: ArrayList<Message>, private val user: String, private val messageListView: ListView, private val conversation: Conversation) :
+class MessageAdapter(
+    context: Context,
+    val messages: ArrayList<Message>,
+    private val user: String,
+    private val messageListView: ListView,
+    private val conversation: Conversation,
+    private val imageLocationText: String
+) :
     ArrayAdapter<Message>(context, R.layout.message_item, messages) {
 
     companion object {
@@ -374,6 +498,12 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
         return 3
     }
 
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val viewType = getItemViewType(position)
@@ -389,6 +519,7 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 }
 
                 val replyText = view.findViewById<TextView>(R.id.replyText)
+                val sentImage = view.findViewById<ImageView>(R.id.sentImage)
 
                 if (messages[position].replyText == "") {
                 } else {
@@ -398,6 +529,30 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 if(replyText.text == "0") {
                     replyText.visibility = View.GONE
                 }
+
+                if(messages[position].imageLocation == "") {
+                    sentImage.visibility = View.GONE
+                } else {
+                    val sentImageRef = Firebase.storage.reference.child("images/" + messages[position].imageLocation)
+
+                    sentImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+                        val profilePictureUri = getImageUriFromBytes(bytes)
+                        Glide.with(view)
+                            .asBitmap()
+                            .load(profilePictureUri)
+                            .error(R.drawable.profile_picture)
+                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                            .thumbnail(0.1f)
+                            .into(object : CustomTarget<Bitmap?>() {
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                                    sentImage.setImageBitmap(resource)
+                                    //profilePicture.startAnimation(fadeInAnim)
+                                }
+
+                                override fun onLoadCleared(placeholder: Drawable?) {} })
+                    }.addOnFailureListener { exception -> }
+                }
+
 
                 val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
                 val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
@@ -420,6 +575,35 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
 
                 val replyText = view.findViewById<TextView>(R.id.replyText)
+                val sentImage = view.findViewById<ImageView>(R.id.sentImage)
+
+                if(messages[position].imageLocation == "") {
+                    sentImage.visibility = View.GONE
+                } else {
+                    val sentImageRef =
+                        Firebase.storage.reference.child("images/" + messages[position].imageLocation)
+
+                    sentImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+                        val profilePictureUri = getImageUriFromBytes(bytes)
+                        Glide.with(view)
+                            .asBitmap()
+                            .load(profilePictureUri)
+                            .error(R.drawable.profile_picture)
+                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                            .thumbnail(0.1f)
+                            .into(object : CustomTarget<Bitmap?>() {
+                                override fun onResourceReady(
+                                    resource: Bitmap,
+                                    transition: Transition<in Bitmap?>?
+                                ) {
+                                    sentImage.setImageBitmap(resource)
+                                    //profilePicture.startAnimation(fadeInAnim)
+                                }
+
+                                override fun onLoadCleared(placeholder: Drawable?) {}
+                            })
+                    }.addOnFailureListener { exception -> }
+                }
 
                 if (messages[position].replyText == "") {
                 } else {
@@ -429,6 +613,7 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 if(replyText.text == "0") {
                     replyText.visibility = View.GONE
                 }
+
 
                 view.setOnTouchListener(object : OnSwipeTouchListener(context, messageListView, context as Conversation, view) {
                     override fun onSwipeRight() {
@@ -539,9 +724,6 @@ open class OnSwipeTouchListener(
         showKeyboardAndFocusEditText(context, message)
     }
 
-
-
-
     fun scrollToBottom() {
         val adapter = listView.adapter
         listView.setSelection(adapter.count - 1)
@@ -627,6 +809,29 @@ open class OnSwipeTouchListener(
         } else {
             listView.setOnTouchListener { _, _ -> true }
         }
+    }
+}
+
+object AESHelper {
+    private const val ALGORITHM = "AES/CBC/PKCS5Padding"
+    private const val KEY_SIZE = 256
+
+    fun generateKey(): SecretKey {
+        val keyGen = KeyGenerator.getInstance("AES")
+        keyGen.init(KEY_SIZE, SecureRandom())
+        return keyGen.generateKey()
+    }
+
+    fun encrypt(plainText: String, secretKey: SecretKey, iv: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(ALGORITHM)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
+        return cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+    }
+
+    fun decrypt(encryptedText: ByteArray, secretKey: SecretKey, iv: ByteArray): String {
+        val cipher = Cipher.getInstance(ALGORITHM)
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+        return cipher.doFinal(encryptedText).toString(Charsets.UTF_8)
     }
 }
 
