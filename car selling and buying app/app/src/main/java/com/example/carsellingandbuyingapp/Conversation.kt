@@ -3,10 +3,14 @@ package com.example.carsellingandbuyingapp
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
@@ -16,11 +20,17 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.time.format.DateTimeFormatter
 import retrofit2.Call
 import retrofit2.http.GET
@@ -29,6 +39,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,9 +64,11 @@ class Conversation : AppCompatActivity() {
     private lateinit var message: EditText
     private lateinit var messageText: CharSequence
     lateinit var cardView: CardView
+    lateinit var cardView2: CardView
     lateinit var close: ImageView
     lateinit var replyText: TextView
     var swipedMessageText: CharSequence = ""
+    private var RESULT_LOAD_IMAGE: Int = 1
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -63,6 +76,19 @@ class Conversation : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
+
+        val profilePicture = findViewById<ImageView>(R.id.profilePicture)
+
+        val attachImage = findViewById<ImageView>(R.id.attachImage)
+
+        cardView2 = findViewById(R.id.cardView2)
+        cardView2.visibility = View.GONE
+
+        attachImage.setOnClickListener {
+            var galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE)
+        }
+
 
         val loggedInUser = application as Username
 
@@ -111,6 +137,34 @@ class Conversation : AppCompatActivity() {
 
         val database = FirebaseDatabase.getInstance().getReference("conversations")
         database.addValueEventListener(valueEventListener)
+
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 100
+
+        val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-" + intent.getStringExtra("user"))
+
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            val profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(this)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.profile_picture)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.1f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        profilePicture.setImageBitmap(resource)
+                        profilePicture.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
+    }
+
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -125,7 +179,7 @@ class Conversation : AppCompatActivity() {
                 if (cardView.visibility == View.GONE) {
                     getCurrentDateTime { currentDateTimeString ->
                         conversation?.let { it1 ->
-                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0")
+                            database.child(it1).child(user + "|" + currentDateTimeString).setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + "")
                         }
                     }
                     message.setText("")
@@ -169,7 +223,7 @@ class Conversation : AppCompatActivity() {
 
                         if (messageUser != user && seenMarker == "0") {
                             seenMarker = "1"
-                            messageTextAndSeenMarker = messageText + ":" + seenMarker
+                            messageTextAndSeenMarker = messageText + ":" + seenMarker + ":" + "REPLY_TO" + ":" + replyText
                             conversation?.let { it1 ->
                                 database.child(it1).child(messageKey).setValue(messageTextAndSeenMarker)
                             }
@@ -238,6 +292,18 @@ class Conversation : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == RESULT_LOAD_IMAGE && data != null) {
+
+            val attachImage = findViewById<ImageView>(R.id.attachedImage)
+            val imageUri = data?.data
+            attachImage.setImageURI(imageUri)
+            cardView2.visibility = View.VISIBLE
+
+        }
+    }
+
 
 
 
@@ -250,8 +316,6 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
     companion object {
         private const val VIEW_TYPE_MY_MESSAGE = 1
         private const val VIEW_TYPE_OTHER_MESSAGE = 2
-        private const val VIEW_TYPE_MY_REPLY = 3
-        private const val VIEW_TYPE_OTHER_REPLY = 4
     }
 
     fun scrollToBottom() {
@@ -299,23 +363,15 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        return if ((message.user == user) && (message.replyText != null)) {
-            if (message.replyText != "") {
-                VIEW_TYPE_MY_REPLY
-            } else {
-                VIEW_TYPE_MY_MESSAGE
-            }
+        return if ((message.user == user)) {
+            VIEW_TYPE_MY_MESSAGE
         } else {
-            if ((message.replyText != "") && (message.replyText != null)) {
-                VIEW_TYPE_OTHER_REPLY
-            } else {
-                VIEW_TYPE_OTHER_MESSAGE
-            }
+            VIEW_TYPE_OTHER_MESSAGE
         }
     }
 
     override fun getViewTypeCount(): Int {
-        return 5
+        return 3
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -331,52 +387,20 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 if (messages[position].seen != "1") {
                     seenMarker.visibility = View.GONE
                 }
-                val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
-                val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
 
-                val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                val outputFormat = DateTimeFormatter.ofPattern("HH:mm")
+                val replyText = view.findViewById<TextView>(R.id.replyText)
 
-                val utcDateTime = LocalDateTime.parse(messages[position].timestamp, inputFormat).atZone(ZoneOffset.UTC)
-                val localDateTime = utcDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
-                val formattedTime = localDateTime.format(outputFormat)
-
-                timeTextView.text = formattedTime
-                messageTextView.text = messages[position].text
-                view.startAnimation(fadeInAnimation)
-                view
-            } VIEW_TYPE_MY_REPLY -> {
-                val view = convertView ?: inflater.inflate(R.layout.reply_item, parent, false)
-                val seenMarker = view.findViewById<ImageView>(R.id.seen)
-                if (messages[position].seen != "1") {
-                    seenMarker.visibility = View.GONE
+                if (messages[position].replyText == "") {
+                } else {
+                    replyText.text = messages[position].replyText
                 }
-                val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
-                val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
-                val replyingTo = view.findViewById<TextView>(R.id.replyText)
 
-                val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
-                val outputFormat = DateTimeFormatter.ofPattern("HH:mm")
-
-                val utcDateTime = LocalDateTime.parse(messages[position].timestamp, inputFormat).atZone(ZoneOffset.UTC)
-                val localDateTime = utcDateTime.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
-                val formattedTime = localDateTime.format(outputFormat)
-
-                timeTextView.text = formattedTime
-                messageTextView.text = messages[position].text
-                replyingTo.text = messages[position].replyText
-
-                view.startAnimation(fadeInAnimation)
-                view
-            } VIEW_TYPE_OTHER_REPLY -> {
-                val view = convertView ?: inflater.inflate(R.layout.reply_item2, parent, false)
-                val seenMarker = view.findViewById<ImageView>(R.id.seen)
-                if (messages[position].seen != "1") {
-                    seenMarker.visibility = View.GONE
+                if(replyText.text == "0") {
+                    replyText.visibility = View.GONE
                 }
+
                 val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
                 val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
-                val replyingTo = view.findViewById<TextView>(R.id.replyText)
 
                 val inputFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                 val outputFormat = DateTimeFormatter.ofPattern("HH:mm")
@@ -387,8 +411,6 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
 
                 timeTextView.text = formattedTime
                 messageTextView.text = messages[position].text
-                replyingTo.text = messages[position].replyText
-
                 view.startAnimation(fadeInAnimation)
                 view
             }
@@ -396,6 +418,17 @@ class MessageAdapter(context: Context, val messages: ArrayList<Message>, private
                 val view = convertView ?: inflater.inflate(R.layout.message_item_2, parent, false)
                 val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
                 val timeTextView = view.findViewById<TextView>(R.id.timeTextView)
+
+                val replyText = view.findViewById<TextView>(R.id.replyText)
+
+                if (messages[position].replyText == "") {
+                } else {
+                    replyText.text = messages[position].replyText
+                }
+
+                if(replyText.text == "0") {
+                    replyText.visibility = View.GONE
+                }
 
                 view.setOnTouchListener(object : OnSwipeTouchListener(context, messageListView, context as Conversation, view) {
                     override fun onSwipeRight() {

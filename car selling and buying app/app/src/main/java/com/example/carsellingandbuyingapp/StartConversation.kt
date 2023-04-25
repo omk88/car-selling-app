@@ -4,20 +4,34 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.File
 
 class StartConversation : AppCompatActivity() {
 
@@ -27,8 +41,6 @@ class StartConversation : AppCompatActivity() {
     private lateinit var usernamesListView: ListView
     private val conversationIndexMap = HashMap<String, Int>()
     private lateinit var welcomeTextView: TextView
-
-
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +57,7 @@ class StartConversation : AppCompatActivity() {
 
         close.setOnClickListener {
             dummyView.requestFocus()
+            welcomeTextView.visibility = View.VISIBLE
         }
 
         close.visibility = View.GONE
@@ -66,11 +79,12 @@ class StartConversation : AppCompatActivity() {
 
         username.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
+                welcomeTextView.visibility = View.GONE
                 conversationListView.visibility = View.GONE
                 usernamesListView.visibility = View.VISIBLE
                 close.visibility = View.VISIBLE
-
             } else {
+                welcomeTextView.visibility = View.VISIBLE
                 conversationListView.visibility = View.VISIBLE
                 usernamesListView.visibility = View.GONE
                 close.visibility = View.GONE
@@ -89,8 +103,6 @@ class StartConversation : AppCompatActivity() {
         conversationListView.visibility = View.VISIBLE
         getUsernames()
 
-
-
         databaseConversation.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val conversationKey = snapshot.key ?: return
@@ -103,7 +115,7 @@ class StartConversation : AppCompatActivity() {
                     val message = messageSnapshot.getValue(String::class.java) ?: continue
                     val sender = messageData.split("|")[0]
                     val parts = message.split(":")
-                    if (parts.size == 2) {
+                    if (parts.size >= 3) {
                         lastMessage = parts[0]
                         if (parts[1] == "0" && sender != loggedInUser.username) {
                             messagesCount += 1
@@ -125,7 +137,6 @@ class StartConversation : AppCompatActivity() {
                 conversationAdapter.notifyDataSetChanged()
             }
 
-
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val conversationKey = snapshot.key ?: return
 
@@ -137,7 +148,7 @@ class StartConversation : AppCompatActivity() {
                     val message = messageSnapshot.getValue(String::class.java) ?: continue
                     val sender = messageData.split("|")[0]
                     val parts = message.split(":")
-                    if (parts.size == 2) {
+                    if (parts.size >= 3) {
                         lastMessage = parts[0]
                         if (parts[1] == "0" && sender != loggedInUser.username) {
                             messagesCount += 1
@@ -149,6 +160,7 @@ class StartConversation : AppCompatActivity() {
                 updateConversation(conversationKey, loggedInUser, index, lastMessage, messagesCount)
                 conversationAdapter.notifyDataSetChanged()
             }
+
 
 
 
@@ -282,7 +294,35 @@ class ConversationAdapter(context: Context, private val messages: ArrayList<Stri
         val messagesCountTextView = view.findViewById<TextView>(R.id.messageCount)
         val unseenMessages = view.findViewById<CardView>(R.id.unseenMessages)
 
-        messagesCountTextView.text = messageCounts[position].toString()
+        val profilePicture = view.findViewById<ImageView>(R.id.profilePicture)
+
+        messageTextView.text = getItem(position)
+
+        val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-" + messageTextView.text)
+
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
+
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            val profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(view)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.profile_picture)
+                .override(200, 200)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.005f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        profilePicture.setImageBitmap(resource)
+                        profilePicture.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // Do nothing, required to be overridden.
+                    }
+                })
+        }.addOnFailureListener { exception -> }
 
         if (messageCounts[position] == 0) {
             unseenMessages.visibility = View.GONE
@@ -305,6 +345,13 @@ class ConversationAdapter(context: Context, private val messages: ArrayList<Stri
 
         return view
     }
+
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
+    }
+
 }
 
 class UsernamesAdapter(context: Context, private val allUsernames: ArrayList<String>) :
@@ -339,8 +386,33 @@ class UsernamesAdapter(context: Context, private val allUsernames: ArrayList<Str
         val view = convertView ?: inflater.inflate(R.layout.user_item2, parent, false)
 
         val messageTextView = view.findViewById<TextView>(R.id.messageTextView)
+        val profilePicture = view.findViewById<ImageView>(R.id.profilePicture)
+
+        var profilePictureUri = Uri.parse("android.resource://your.package.name/" + R.drawable.profile_picture)
+
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 500
 
         messageTextView.text = getItem(position)
+
+        val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-" + messageTextView.text)
+
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(view)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.profile_picture)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.1f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        profilePicture.setImageBitmap(resource)
+                        profilePicture.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
 
         messageTextView.setOnClickListener {
             val activity = context as Activity
@@ -351,6 +423,14 @@ class UsernamesAdapter(context: Context, private val allUsernames: ArrayList<Str
         }
 
         return view
+    }
+
+
+
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
     }
 }
 

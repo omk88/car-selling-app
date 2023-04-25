@@ -21,12 +21,30 @@
         android:padding="20dp"
         android:id="@+id/cardView">
 
+
         <LinearLayout
             android:padding="8dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_marginBottom="8dp"
+                android:layout_weight="10"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:background="@drawable/reply_message_background"
+                android:maxEms="12"
+                android:fontFamily="@font/poppins_regular"
+                android:gravity="top"
+                android:text="0"
+                android:id="@+id/replyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
 
             <TextView
                 android:maxEms="12"
