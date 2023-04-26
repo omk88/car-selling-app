@@ -28,16 +28,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_marginBottom="8dp"
-                android:scaleType="centerCrop"
-                android:id="@+id/sentImage"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_weight="10"
-                app:srcCompat="@drawable/selectimage" />
+            <androidx.cardview.widget.CardView
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                app:cardBackgroundColor="#A3B4FF"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:scaleType="centerCrop"
+                    android:id="@+id/sentImage"
+                    android:layout_width="300dp"
+                    android:layout_height="200dp"
+                    android:layout_weight="10"
+                    app:srcCompat="@drawable/selectimage" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:layout_weight="10"
                 android:paddingLeft="5dp"

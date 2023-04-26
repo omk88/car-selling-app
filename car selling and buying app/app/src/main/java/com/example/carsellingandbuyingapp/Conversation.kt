@@ -1,5 +1,6 @@
 package com.example.carsellingandbuyingapp
 
+import android.util.Base64
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.ContentResolver
@@ -14,6 +15,7 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.MediaStore
+import android.util.Base64.encodeToString
 import android.util.Log
 import android.view.*
 import android.view.animation.AlphaAnimation
@@ -45,6 +47,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 import java.time.*
 import java.util.*
@@ -53,6 +56,7 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
 
 interface WorldTimeApiService {
@@ -64,8 +68,7 @@ data class WorldTimeApiResponse(
     val utc_datetime: String
 )
 
-
-class Conversation : AppCompatActivity() {
+class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback {
 
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var messageListView: ListView
@@ -83,12 +86,30 @@ class Conversation : AppCompatActivity() {
     var imageLocation: String = ""
     lateinit var attachImage: ImageView
     var imageUri: Uri? = null
+    var secretKey = SecretKeySpec("your-secret-key-here".toByteArray(), "AES")
+    var iv = "your-iv-here".toByteArray()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversation)
+
+        /*secretKey = AESHelper.generateKey() as SecretKeySpec
+
+        val ivSize = 16 // AES block size is 128 bits = 16 bytes
+        val random = SecureRandom()
+        iv = ByteArray(ivSize)
+        random.nextBytes(iv)*/
+
+        val hardcodedKey = "a9bicoepvn29dlpa"
+        val keyBytes = hardcodedKey.toByteArray(StandardCharsets.UTF_8)
+        secretKey = SecretKeySpec(keyBytes, "AES")
+
+        val hardcodedIv = "03lpcmyinqusny07"
+        val ivBytes = hardcodedIv.toByteArray(StandardCharsets.UTF_8)
+        iv = ivBytes
+
 
         val profilePicture = findViewById<ImageView>(R.id.profilePicture)
 
@@ -191,39 +212,51 @@ class Conversation : AppCompatActivity() {
             if(messageText != "") {
                 if (cardView.visibility == View.GONE) {
                     if (cardView2.visibility != View.GONE) {
+                        cardView2.visibility = View.GONE
                         val randomString = uploadImage()
                         getCurrentDateTime { currentDateTimeString ->
                             conversation?.let { it1 ->
+                                val encryptedMessage = AESHelper.encrypt(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + "" + ":" + "IMAGE_SHOWN" + ":" + randomString, secretKey, iv)
+                                val base64EncodedMessage = Base64.encodeToString(encryptedMessage, Base64.NO_WRAP)
                                 database.child(it1).child(user + "|" + currentDateTimeString)
-                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + "" + ":" + "IMAGE_SHOWN" + ":" + randomString)
+                                    .setValue(base64EncodedMessage)
                             }
                         }
                         message.setText("")
                     } else {
                         getCurrentDateTime { currentDateTimeString ->
                             conversation?.let { it1 ->
+                                val encryptedMessage = AESHelper.encrypt(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + ""  + ":" +  "IMAGE_SHOWN" + ":", secretKey, iv)
+                                val base64EncodedMessage = Base64.encodeToString(encryptedMessage, Base64.NO_WRAP)
                                 database.child(it1).child(user + "|" + currentDateTimeString)
-                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + ""  + ":" +  "IMAGE_SHOWN" + ":")
+                                    .setValue(base64EncodedMessage)
                             }
                         }
                         message.setText("")
                     }
                 } else {
                     if (cardView2.visibility != View.GONE) {
+                        cardView2.visibility = View.GONE
                         val randomString = uploadImage()
                         getCurrentDateTime { currentDateTimeString ->
                             conversation?.let { it1 ->
+                                val encryptedMessage = AESHelper.encrypt(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":" + randomString, secretKey, iv)
+                                val base64EncodedMessage = Base64.encodeToString(encryptedMessage, Base64.NO_WRAP)
                                 database.child(it1).child(user + "|" + currentDateTimeString)
-                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":" + randomString)
+                                    .setValue(base64EncodedMessage)
                             }
                         }
+                        message.setText("")
                     } else {
                         getCurrentDateTime { currentDateTimeString ->
                             conversation?.let { it1 ->
+                                val encryptedMessage = AESHelper.encrypt(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":", secretKey, iv)
+                                val base64EncodedMessage = Base64.encodeToString(encryptedMessage, Base64.NO_WRAP)
                                 database.child(it1).child(user + "|" + currentDateTimeString)
-                                    .setValue(messageText.toString() + ":" + "0" + ":" + "REPLY_TO" + ":" + replyText.text.toString() + ":" + "IMAGE_SHOWN" + ":")
+                                    .setValue(base64EncodedMessage)
                             }
                         }
+                        message.setText("")
                     }
                 }
             }
@@ -231,7 +264,7 @@ class Conversation : AppCompatActivity() {
 
 
         messageListView = findViewById(R.id.messageList)
-        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView, this, imageLocation)
+        messageAdapter = MessageAdapter(this, ArrayList(), user, messageListView, this, imageLocation, this)
         messageListView.adapter = messageAdapter
 
         if (databaseMessages != null) {
@@ -243,6 +276,8 @@ class Conversation : AppCompatActivity() {
                     var replyText = ""
                     var imageMessageLocation = ""
                     var messageTextAndSeenMarker = snapshot.getValue(String::class.java).toString()
+                    val encryptedMessage = Base64.decode(messageTextAndSeenMarker, Base64.NO_WRAP)
+                    messageTextAndSeenMarker = AESHelper.decrypt(encryptedMessage, secretKey, iv)
                     if (messageTextAndSeenMarker != null) {
                         messageText = messageTextAndSeenMarker.split(":")[0]
                         seenMarker = messageTextAndSeenMarker.split(":")[1]
@@ -256,6 +291,7 @@ class Conversation : AppCompatActivity() {
                     }
 
                     if (messageKey != null && messageTextAndSeenMarker != null) {
+
                         val messageUser = messageKey.split("|")[0]
                         val timestamp = messageKey.split("|")[1]
                         if(messageTextAndSeenMarker.contains("REPLY_TO", ignoreCase = false)) {
@@ -270,14 +306,16 @@ class Conversation : AppCompatActivity() {
                             seenMarker = "1"
                             messageTextAndSeenMarker = messageText + ":" + seenMarker + ":" + "REPLY_TO" + ":" + replyText + ":" + "IMAGE_SHOWN" + ":" + imageMessageLocation
                             conversation?.let { it1 ->
-                                database.child(it1).child(messageKey).setValue(messageTextAndSeenMarker)
+                                val encryptedMessage = AESHelper.encrypt(messageTextAndSeenMarker, secretKey, iv)
+                                val base64EncodedMessage = Base64.encodeToString(encryptedMessage, Base64.NO_WRAP)
+                                database.child(it1).child(messageKey).setValue(base64EncodedMessage)
                             }
                         }
 
                         val message = Message(messageUser, messageText, timestamp, seenMarker, replyText, imageMessageLocation)
 
                         if (!messageAdapter.messageExists(messageKey)) {
-                            messageAdapter.add(message)
+                            messageAdapter.addMessage(message)
                             messageAdapter.notifyDataSetChanged()
                             messageAdapter.sortMessages()
                         }
@@ -410,6 +448,7 @@ class Conversation : AppCompatActivity() {
                 uploadTask.addOnSuccessListener {
                     images[i].downloadUrl.addOnSuccessListener { _ ->
                         pd.dismiss()
+                        messageAdapter.notifyDataSetChanged()
                     }
                 }.addOnFailureListener { exception ->
                     Toast.makeText(applicationContext, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -425,6 +464,10 @@ class Conversation : AppCompatActivity() {
             .map { allowedChars.random() }
             .joinToString("")
     }
+
+    override fun onMessageAdded() {
+
+    }
 }
 
 class MessageAdapter(
@@ -433,13 +476,25 @@ class MessageAdapter(
     private val user: String,
     private val messageListView: ListView,
     private val conversation: Conversation,
-    private val imageLocationText: String
+    private val imageLocationText: String,
+    private val onMessageAddedCallback: OnMessageAddedCallback
 ) :
     ArrayAdapter<Message>(context, R.layout.message_item, messages) {
 
     companion object {
         private const val VIEW_TYPE_MY_MESSAGE = 1
         private const val VIEW_TYPE_OTHER_MESSAGE = 2
+    }
+
+    fun addMessage(newMessage: Message) {
+        messages.add(newMessage)
+        notifyDataSetChanged()
+        onMessageAddedCallback.onMessageAdded()
+    }
+
+
+    interface OnMessageAddedCallback {
+        fun onMessageAdded()
     }
 
     fun scrollToBottom() {

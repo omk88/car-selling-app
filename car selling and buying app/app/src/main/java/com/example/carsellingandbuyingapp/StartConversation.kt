@@ -35,7 +35,7 @@ import java.io.File
 
 class StartConversation : AppCompatActivity() {
 
-    private lateinit var conversationAdapter: ConversationAdapter
+    private var conversationAdapter: ConversationAdapter? = null
     private lateinit var usernamesAdapter: UsernamesAdapter
     private lateinit var conversationListView: ListView
     private lateinit var usernamesListView: ListView
@@ -123,18 +123,18 @@ class StartConversation : AppCompatActivity() {
                     }
                 }
 
-                val index = conversationAdapter.count
+                val index = conversationAdapter!!.count
                 conversationIndexMap[conversationKey] = index
 
                 val firstUser = conversationKey.split(":")[0]
                 val secondUser = conversationKey.split(":")[1]
                 val targetUsername = if (loggedInUser.username == firstUser) secondUser else firstUser
 
-                conversationAdapter.removeByUsername(targetUsername)
-                conversationAdapter.add(targetUsername)
-                conversationAdapter.addLastMessage(lastMessage)
-                conversationAdapter.addMessageCount(messagesCount)
-                conversationAdapter.notifyDataSetChanged()
+                conversationAdapter!!.removeByUsername(targetUsername)
+                conversationAdapter!!.add(targetUsername)
+                conversationAdapter!!.addLastMessage(lastMessage)
+                conversationAdapter!!.addMessageCount(messagesCount)
+                conversationAdapter!!.notifyDataSetChanged()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -158,7 +158,7 @@ class StartConversation : AppCompatActivity() {
 
                 val index = conversationIndexMap[conversationKey] ?: return
                 updateConversation(conversationKey, loggedInUser, index, lastMessage, messagesCount)
-                conversationAdapter.notifyDataSetChanged()
+                conversationAdapter!!.notifyDataSetChanged()
             }
 
 
@@ -191,16 +191,18 @@ class StartConversation : AppCompatActivity() {
         val targetUsername = if (loggedInUser.username == firstUser) secondUser else firstUser
 
         if (conversationIndexMap.containsKey(conversationKey)) {
-            conversationAdapter.update(conversationIndexMap[conversationKey]!!, targetUsername, lastMessage, messagesCount)
+            conversationAdapter?.update(conversationIndexMap[conversationKey]!!, targetUsername, lastMessage, messagesCount)
         } else {
-            conversationAdapter.removeByUsername(targetUsername)
-            conversationAdapter.add(targetUsername)
-            conversationAdapter.addLastMessage(lastMessage)
-            conversationAdapter.addMessageCount(messagesCount)
-            conversationAdapter.notifyDataSetChanged()
+            conversationAdapter?.removeByUsername(targetUsername)
+            conversationAdapter?.add(targetUsername)
+            conversationAdapter?.addLastMessage(lastMessage)
+            conversationAdapter?.addMessageCount(messagesCount)
+            conversationAdapter?.notifyDataSetChanged()
 
-            val newIndex = conversationAdapter.count - 1
-            conversationIndexMap[conversationKey] = newIndex
+            val newIndex = conversationAdapter?.count?.minus(1)
+            if (newIndex != null) {
+                conversationIndexMap[conversationKey] = newIndex.toInt()
+            }
         }
     }
 
