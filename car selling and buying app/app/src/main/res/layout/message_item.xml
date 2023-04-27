@@ -38,12 +38,13 @@
                 app:cardElevation="0dp">
 
                 <ImageView
+                    android:background="#E0E0E0"
+                    android:backgroundTint="#E0E0E0"
                     android:scaleType="centerCrop"
                     android:id="@+id/sentImage"
                     android:layout_width="300dp"
                     android:layout_height="200dp"
-                    android:layout_weight="10"
-                    app:srcCompat="@drawable/selectimage" />
+                    android:layout_weight="10" />
             </androidx.cardview.widget.CardView>
 
             <TextView

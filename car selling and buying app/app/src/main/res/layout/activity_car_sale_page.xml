@@ -24,6 +24,7 @@
 
 
             <LinearLayout
+                android:id="@+id/goBack"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
@@ -133,8 +134,8 @@
                                 android:layout_width="400dp"
                                 android:layout_height="match_parent"
                                 android:adjustViewBounds="true"
-                                android:background="#6393C2D6"
-                                android:backgroundTint="#0BACF4"
+                                android:background="#E0E0E0"
+                                android:backgroundTint="#E0E0E0"
                                 android:scaleType="centerCrop"
                                 tools:srcCompat="@drawable/selectimage" />
 
@@ -143,8 +144,8 @@
                                 android:layout_width="400dp"
                                 android:layout_height="match_parent"
                                 android:adjustViewBounds="true"
-                                android:background="#6393C2D6"
-                                android:backgroundTint="#0BACF4"
+                                android:background="#E0E0E0"
+                                android:backgroundTint="#E0E0E0"
                                 android:baselineAligned="false"
                                 android:scaleType="centerCrop"
                                 tools:srcCompat="@drawable/selectimage" />
@@ -154,8 +155,8 @@
                                 android:layout_width="400dp"
                                 android:layout_height="match_parent"
                                 android:adjustViewBounds="true"
-                                android:background="#6393C2D6"
-                                android:backgroundTint="#0BACF4"
+                                android:background="#E0E0E0"
+                                android:backgroundTint="#E0E0E0"
                                 android:scaleType="centerCrop"
                                 tools:srcCompat="@drawable/selectimage" />
                         </LinearLayout>
@@ -535,7 +536,7 @@
         <LinearLayout
             android:gravity="center"
             android:layout_weight="1"
-            android:id="@+id/linearLayout23"
+            android:id="@+id/messageSeller"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -568,7 +569,7 @@
         <LinearLayout
             android:gravity="center"
             android:layout_weight="1"
-            android:id="@+id/linearLayout25"
+            android:id="@+id/callSeller"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/white"
@@ -599,21 +600,4 @@
                 android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:visibility="gone"
-            android:id="@+id/callSeller"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/button_background"
-            android:fontFamily="@font/poppins_regular"
-            android:onClick="switchToSellCar3"
-            android:text="Call Seller"
-            android:textColor="#36454F"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

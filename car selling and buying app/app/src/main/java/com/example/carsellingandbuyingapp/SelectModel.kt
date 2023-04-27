@@ -11,7 +11,7 @@ class SelectModel : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_select_make)
+        setContentView(R.layout.activity_select_model)
 
         val selectedMinPrice = intent.getStringExtra("selected_minPrice")
         val selectedMaxPrice = intent.getStringExtra("selected_maxPrice")
@@ -150,19 +150,42 @@ class SelectModel : AppCompatActivity() {
             previousFirstChar = currentFirstChar
 
             textView.setOnClickListener {
-                val intent = Intent(this@SelectModel, Search::class.java)
-                intent.putExtra("selected_model", textView.text.toString())
-                intent.putExtra("selected_make", selectedMake)
-                intent.putExtra("selected_minEmissions", selectedMinEmissions)
-                intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
-                intent.putExtra("selected_colour", selectedColour)
-                intent.putExtra("selected_minPrice", selectedMinPrice)
-                intent.putExtra("selected_maxPrice", selectedMaxPrice)
-                intent.putExtra("selected_minYear", selectedMinYear)
-                intent.putExtra("selected_maxYear", selectedMaxYear)
-                intent.putExtra("selected_fuelType", selectedFuelType)
-                startActivity(intent)
-                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+                if (intent.getStringExtra("page") == null) {
+                    val intent = Intent(this@SelectModel, Search::class.java)
+                    intent.putExtra("selected_model", textView.text.toString())
+                    intent.putExtra("selected_make", selectedMake)
+                    intent.putExtra("selected_minEmissions", selectedMinEmissions)
+                    intent.putExtra("selected_maxEmissions", selectedMaxEmissions)
+                    intent.putExtra("selected_colour", selectedColour)
+                    intent.putExtra("selected_minPrice", selectedMinPrice)
+                    intent.putExtra("selected_maxPrice", selectedMaxPrice)
+                    intent.putExtra("selected_minYear", selectedMinYear)
+                    intent.putExtra("selected_maxYear", selectedMaxYear)
+                    intent.putExtra("selected_fuelType", selectedFuelType)
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+                } else {
+                    val carText = intent.getStringExtra("carText")
+                    val reg = intent.getStringExtra("registration")
+                    val price = intent.getStringExtra("price")
+                    val condition = intent.getStringExtra("condition")
+                    val mileage = intent.getStringExtra("mileage")
+                    val imageUri0 = intent.getStringExtra("imageUri0")
+                    val imageUri1 = intent.getStringExtra("imageUri1")
+                    val imageUri2 = intent.getStringExtra("imageUri2")
+                    val intent = Intent(this@SelectModel, SellCar2::class.java)
+                    intent.putExtra("selected_model", textView.text.toString())
+                    intent.putExtra("carText", carText)
+                    intent.putExtra("registration", reg)
+                    intent.putExtra("imageUri0", imageUri0)
+                    intent.putExtra("imageUri1", imageUri1)
+                    intent.putExtra("imageUri2", imageUri2)
+                    intent.putExtra("price", price)
+                    intent.putExtra("condition", condition)
+                    intent.putExtra("mileage", mileage)
+                    startActivity(intent)
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+                }
             }
         }
     }

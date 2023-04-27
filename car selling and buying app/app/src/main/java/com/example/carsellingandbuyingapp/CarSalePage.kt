@@ -1,16 +1,28 @@
 package com.example.carsellingandbuyingapp
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -28,6 +40,7 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
     private val geocoderCache = mutableMapOf<String, LatLng?>()
     private var address = ""
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_car_sale_page)
@@ -68,7 +81,24 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
         val image1View = findViewById<ImageView>(R.id.image1)
         val image2View = findViewById<ImageView>(R.id.image2)
 
-        val callSellerButton: Button = findViewById(R.id.callSeller)
+        val callSellerButton = findViewById<LinearLayout>(R.id.callSeller)
+        val messageSellerButton = findViewById<LinearLayout>(R.id.messageSeller)
+        val goBack = findViewById<LinearLayout>(R.id.goBack)
+
+        goBack.setOnClickListener {
+            val username = userText.text.toString()
+            val intent = Intent(this@CarSalePage, MainPage::class.java)
+            startActivity(intent)
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+        }
+
+        messageSellerButton.setOnClickListener {
+            val username = userText.text.toString()
+            val intent = Intent(this@CarSalePage, Conversation::class.java)
+            intent.putExtra("user", username)
+            startActivity(intent)
+            overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+        }
 
         callSellerButton.setOnClickListener{
             database.child(registration).get().addOnSuccessListener {
@@ -92,16 +122,94 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 100
+
+        val errorPlaceholder = "#E0E0E0".toColorDrawable()
+
         image0.downloadUrl.addOnSuccessListener { uri ->
-            Glide.with(this).load(uri).into(image0View)
+            Glide.with(this)
+                .load(uri)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        image0View.startAnimation(fadeInAnim)
+                        return false
+                    }
+                })
+                .apply(RequestOptions().error(errorPlaceholder)).placeholder(errorPlaceholder)
+                .into(image0View)
+
         }
 
         image1.downloadUrl.addOnSuccessListener { uri ->
-            Glide.with(this).load(uri).into(image1View)
+            Glide.with(this)
+                .load(uri)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        image1View.startAnimation(fadeInAnim)
+                        return false
+                    }
+                })
+                .apply(RequestOptions().error(errorPlaceholder)).placeholder(errorPlaceholder)
+                .into(image1View)
         }
 
         image2.downloadUrl.addOnSuccessListener { uri ->
-            Glide.with(this).load(uri).into(image2View)
+            Glide.with(this)
+                .load(uri)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        image2View.startAnimation(fadeInAnim)
+                        return false
+                    }
+                })
+                .apply(RequestOptions().error(errorPlaceholder)).placeholder(errorPlaceholder)
+                .into(image2View)
         }
 
 
@@ -170,5 +278,9 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
         if (latLng != null) {
             addMarkerForAddress(address, latLng)
         }
+    }
+
+    fun String.toColorDrawable(): ColorDrawable {
+        return ColorDrawable(Color.parseColor(this))
     }
 }

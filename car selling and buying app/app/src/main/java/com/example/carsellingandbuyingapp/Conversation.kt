@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -26,8 +28,13 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -109,7 +116,6 @@ class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback 
         val hardcodedIv = "03lpcmyinqusny07"
         val ivBytes = hardcodedIv.toByteArray(StandardCharsets.UTF_8)
         iv = ivBytes
-
 
         val profilePicture = findViewById<ImageView>(R.id.profilePicture)
 
@@ -235,6 +241,7 @@ class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback 
                         message.setText("")
                     }
                 } else {
+                    cardView.visibility = View.GONE
                     if (cardView2.visibility != View.GONE) {
                         cardView2.visibility = View.GONE
                         val randomString = uploadImage()
@@ -559,6 +566,10 @@ class MessageAdapter(
         return Uri.fromFile(file)
     }
 
+    fun String.toColorDrawable(): ColorDrawable {
+        return ColorDrawable(Color.parseColor(this))
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val viewType = getItemViewType(position)
@@ -638,25 +649,35 @@ class MessageAdapter(
                     val sentImageRef =
                         Firebase.storage.reference.child("images/" + messages[position].imageLocation)
 
+                    val errorPlaceholder = "#E0E0E0".toColorDrawable()
+
                     sentImageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
                         val profilePictureUri = getImageUriFromBytes(bytes)
                         Glide.with(view)
                             .asBitmap()
                             .load(profilePictureUri)
-                            .error(R.drawable.profile_picture)
-                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                            .thumbnail(0.1f)
-                            .into(object : CustomTarget<Bitmap?>() {
-                                override fun onResourceReady(
-                                    resource: Bitmap,
-                                    transition: Transition<in Bitmap?>?
-                                ) {
-                                    sentImage.setImageBitmap(resource)
-                                    //profilePicture.startAnimation(fadeInAnim)
+                            .listener(object : RequestListener<Bitmap> {
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Bitmap>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
                                 }
 
-                                override fun onLoadCleared(placeholder: Drawable?) {}
+                                override fun onResourceReady(
+                                    resource: Bitmap?,
+                                    model: Any?,
+                                    target: Target<Bitmap>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
+                                }
                             })
+                            .apply(RequestOptions().error(errorPlaceholder)).placeholder(errorPlaceholder)
+                            .into(sentImage)
                     }.addOnFailureListener { exception -> }
                 }
 

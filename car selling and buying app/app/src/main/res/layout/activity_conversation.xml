@@ -213,9 +213,6 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-
-
-
                 <EditText
                     android:maxLines="7"
                     android:inputType="textMultiLine"

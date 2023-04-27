@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,13 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.File
+import java.nio.charset.StandardCharsets
+import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class StartConversation : AppCompatActivity() {
 
@@ -41,11 +49,21 @@ class StartConversation : AppCompatActivity() {
     private lateinit var usernamesListView: ListView
     private val conversationIndexMap = HashMap<String, Int>()
     private lateinit var welcomeTextView: TextView
+    var secretKey = SecretKeySpec("your-secret-key-here".toByteArray(), "AES")
+    var iv = "your-iv-here".toByteArray()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_conversations)
+
+        val hardcodedKey = "a9bicoepvn29dlpa"
+        val keyBytes = hardcodedKey.toByteArray(StandardCharsets.UTF_8)
+        secretKey = SecretKeySpec(keyBytes, "AES")
+
+        val hardcodedIv = "03lpcmyinqusny07"
+        val ivBytes = hardcodedIv.toByteArray(StandardCharsets.UTF_8)
+        iv = ivBytes
 
         welcomeTextView = findViewById(R.id.welcome)
 
@@ -103,6 +121,7 @@ class StartConversation : AppCompatActivity() {
         conversationListView.visibility = View.VISIBLE
         getUsernames()
 
+
         databaseConversation.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val conversationKey = snapshot.key ?: return
@@ -112,7 +131,11 @@ class StartConversation : AppCompatActivity() {
 
                 for (messageSnapshot in snapshot.children) {
                     val messageData = messageSnapshot.key ?: continue
-                    val message = messageSnapshot.getValue(String::class.java) ?: continue
+                    var message = messageSnapshot.getValue(String::class.java) ?: continue
+
+                    val encryptedMessage = Base64.decode(message, Base64.NO_WRAP)
+                    message = AESHelper.decrypt(encryptedMessage, secretKey, iv)
+
                     val sender = messageData.split("|")[0]
                     val parts = message.split(":")
                     if (parts.size >= 3) {

@@ -243,7 +243,7 @@ class Profile : AppCompatActivity() {
             }
         }
 
-        val showPopupButton = findViewById<Button>(R.id.callSeller)
+        val showPopupButton = findViewById<LinearLayout>(R.id.callSeller)
 
         val ecoSalesListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {

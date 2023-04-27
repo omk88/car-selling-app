@@ -28,8 +28,6 @@ import java.util.ArrayList
 
 class MainPage : AppCompatActivity() {
 
-    private lateinit var carRecommendationModel: CarRecommendationModel
-
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +46,6 @@ class MainPage : AppCompatActivity() {
 
         val loggedInUser = application as Username
         var username = loggedInUser.username
-        Toast.makeText(this, username.toString(), Toast.LENGTH_SHORT).show()
 
         val bannerRef = Firebase.storage.reference.child("images/banner-$username")
         val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-$username")
@@ -109,7 +106,6 @@ class MainPage : AppCompatActivity() {
             username?.let {}
         }.addOnFailureListener { exception -> }
 
-        carRecommendationModel = CarRecommendationModel(this)
 
         val cardView = findViewById<CardView>(R.id.cardView)
         val search = findViewById<EditText>(R.id.search)
