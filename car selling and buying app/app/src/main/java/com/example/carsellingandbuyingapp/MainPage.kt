@@ -1,5 +1,7 @@
 package com.example.carsellingandbuyingapp
 
+import kotlin.math.sqrt
+
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -36,127 +38,7 @@ class MainPage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
 
-        val tfliteModel = loadModelFile(this, "price_recommendation_model.tflite")
-        val tflite = Interpreter(tfliteModel)
-
-        var colour = "Red"
-        var condition = "Spares Or Repairs"
-        var make = "Ford"
-        var model = "Focus"
-        var mileage = 0
-        var yearOfManufacture = 2000
-        
-
-        val colours = listOf("Black", "Blue", "Grey", "Red", "Silver", "White")
-        val conditions = listOf("Good Condition", "Perfect Condition", "Poor Condition", "Spares Or Repairs")
-        val makes = resources.getStringArray(R.array.make_items_2).toList()
-        val models = resources.getStringArray(R.array.model_items).toList()
-
-        val colourEncoded = oneHotEncode(colour, colours)
-        val conditionEncoded = oneHotEncode(condition, conditions)
-        val makeEncoded = oneHotEncode(make, makes)
-        val modelEncoded = oneHotEncode(model, models)
-
-        val scaledMileage = standardize(mileage.toDouble(), 356243.1805, 171069.5643724576)
-        val scaledYearOfManufacture = standardize(yearOfManufacture.toDouble(), 1987.391, 12.732875519693106)
-
-
-        println("Colour encoded length: ${colourEncoded.size}")
-        println("Condition encoded length: ${conditionEncoded.size}")
-        println("Make encoded length: ${makeEncoded.size}")
-        println("Model encoded length: ${modelEncoded.size}")
-
-        val mileageMean = 354108.950375
-        val mileageStd = 171900.9895738319
-        val yearOfManufactureMean = 1987.5845
-        val yearOfManufactureStd = 12.89848284683125
-
-        //val scaledMileage = (mileage - mileageMean) / mileageStd
-        //val scaledYearOfManufacture = (yearOfManufacture - yearOfManufactureMean) / yearOfManufactureStd
-
-        val currentYear = 2023
-        val age = currentYear - yearOfManufacture
-        val ageWeight = 0
-        val weightedAge = age * ageWeight
-        val ageSquared = weightedAge * weightedAge
-
-
-
-        val inputArray = floatArrayOf(
-            *colourEncoded.copyOfRange(0, colourEncoded.size),
-            *conditionEncoded.copyOfRange(0, conditionEncoded.size),
-            *makeEncoded.copyOfRange(0, makeEncoded.size),
-            *modelEncoded.copyOfRange(0, modelEncoded.size),
-            scaledMileage,
-            scaledYearOfManufacture
-        )
-
-        println("TEST"+modelEncoded.contentToString())
-
-
-        val correctedInputArray = floatArrayOf(
-            *colourEncoded.copyOfRange(0, colourEncoded.size),
-            *conditionEncoded.copyOfRange(0, conditionEncoded.size),
-            *makeEncoded.copyOfRange(0, makeEncoded.size),
-            *modelEncoded.copyOfRange(0, modelEncoded.size),
-            scaledMileage,
-            scaledYearOfManufacture
-        )
-
-
-
-        val inputTensor = tflite.getInputTensor(0)
-        val inputShape = inputTensor.shape()
-        val inputSize = inputTensor.numBytes()
-
-
-        println("Input tensor shape: ${inputShape.contentToString()}")
-        println("Input array shape: ${inputArray.size}")
-
-
-        val inputBuffer = ByteBuffer.allocateDirect(inputSize)
-            .order(ByteOrder.nativeOrder())
-
-        val expectedInputArrayLength = inputShape[1]
-
-        if (correctedInputArray.size != expectedInputArrayLength) {
-            throw RuntimeException("Input array length (${inputArray.size}) does not match the expected length ($expectedInputArrayLength)")
-        }
-
-
-        inputBuffer.asFloatBuffer().put(inputArray)
-        //inputBuffer.rewind()
-
-
-        val outputShape = tflite.getOutputTensor(0).shape()
-        val outputDataType = tflite.getOutputTensor(0).dataType()
-        val outputBuffer = TensorBuffer.createFixedSize(outputShape, outputDataType)
-
-        tflite.run(inputBuffer, outputBuffer.buffer)
-        val outputArray = outputBuffer.floatArray
-
-/*
-        if (condition == "Poor Condition") {
-            println("Predicted price: ${outputArray[0]*100}")
-        } else if (condition == "Spares Or Repairs") {
-            println("Predicted price: ${outputArray[0]*10}")
-        } else if (condition == "Good Condition") {
-
-        }
-*/
-
-        println("Predicted price: ${outputArray[0]}")
-
-        println("Kotlin preprocessed input array: ${correctedInputArray.contentToString()}")
-
-        println("Colour encoded: ${colourEncoded.contentToString()}")
-        println("Condition encoded: ${conditionEncoded.contentToString()}")
-        println("Make encoded: ${makeEncoded.contentToString()}")
-        println("Model encoded: ${modelEncoded.contentToString()}")
-
-
-
-
+        main()
 
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
@@ -302,6 +184,7 @@ class MainPage : AppCompatActivity() {
                 val emissions = snapshot.child("co2Emissions").getValue().toString()
                 val engineCapacity = snapshot.child("engineCapacity").getValue().toString()
                 val fuelType = snapshot.child("fuelType").getValue().toString()
+                val priceType = snapshot.child("priceType").getValue().toString()
 
                 val regex = Regex(",\\s*([a-zA-Z]+)\\s*[a-zA-Z]*\\s*\\d")
                 val matchResult = regex.find(snapshot.child("address").getValue().toString())
@@ -332,7 +215,8 @@ class MainPage : AppCompatActivity() {
                                 mileage,
                                 address,
                                 condition,
-                                registration
+                                registration,
+                                priceType
                             )
 
                             var flag = false
@@ -439,29 +323,977 @@ class MainPage : AppCompatActivity() {
         return Uri.fromFile(file)
     }
 
-    fun oneHotEncode(value: String, categories: List<String>): FloatArray {
-        val index = categories.indexOf(value)
-        val encoded = FloatArray(categories.size) { 0.0f }
-        if (index >= 0 && index < categories.size) {
-            encoded[index] = 1.0f
+    fun mapInput(input: String, category: String): Double {
+        val useEncoding = mapOf("Leisure and Recreation" to 1.0, "Commuting" to 0.0, "General Use" to 0.5, "Work Vehicle" to 0.75)
+        val priceEncoding = mapOf("Below £1000" to 0.0, "£1000 to £10,000" to 0.0, "£10,000 to £50,000" to 0.5, "£50,000+" to 1.0)
+        val bodyEncoding = mapOf("Saloon" to 0.0, "SUV" to 0.25, "Estate" to 0.5, "Coupe" to 0.75, "Hatchback" to 1.0, "Other / No preference" to 0.625)
+        val ecoPerfLuxResaleEncoding = mapOf("Very Important" to 1.0, "Somewhat Important" to 0.5, "Not Important" to 0.0)
+
+        val encodingDict = mapOf(
+            "Use" to useEncoding,
+            "Price" to priceEncoding,
+            "Body" to bodyEncoding,
+            "Eco" to ecoPerfLuxResaleEncoding,
+            "Performance" to ecoPerfLuxResaleEncoding,
+            "Luxury" to ecoPerfLuxResaleEncoding,
+            "Resale" to ecoPerfLuxResaleEncoding
+        )
+
+        return encodingDict[category]?.get(input) ?: 0.0
+    }
+
+    fun cosineSimilarity(v1: List<Double>, v2: List<Double>): Double {
+        val dotProduct = v1.zip(v2).sumByDouble { (a, b) -> a * b }
+        val mag1 = sqrt(v1.sumByDouble { it * it })
+        val mag2 = sqrt(v2.sumByDouble { it * it })
+
+        return dotProduct / (mag1 * mag2)
+    }
+
+    fun predictCarBrands(inputPreferences: List<Pair<String, String>>, carBrands: List<CarBrand>): List<CarBrand> {
+        val inputVector = inputPreferences.map { mapInput(it.second, it.first) }
+        val similarities = carBrands.map { carBrand ->
+            val carBrandVector = listOf(carBrand.use, carBrand.price, carBrand.body, carBrand.eco, carBrand.performance, carBrand.luxury, carBrand.resale)
+            val similarity = cosineSimilarity(inputVector, carBrandVector)
+            carBrand.copy(name = carBrand.name, use = similarity) // Using 'use' field to store similarity, you can create another field if needed
         }
-        return encoded
+        return similarities.sortedByDescending { it.use }
     }
 
-    fun standardize(value: Double, mean: Double, std: Double): Float {
-        return ((value - mean) / std).toFloat()
+    fun convertToCarBrandList(data: List<Map<String, String>>): List<CarBrand> {
+        return data.map { item ->
+            CarBrand(
+                name = item["Car Brand"] ?: "",
+                use = mapInput(item["Use"] ?: "", "Use"),
+                price = mapInput(item["Price"] ?: "", "Price"),
+                body = mapInput(item["Body"] ?: "", "Body"),
+                eco = mapInput(item["Eco"] ?: "", "Eco"),
+                performance = mapInput(item["Performance"] ?: "", "Performance"),
+                luxury = mapInput(item["Luxury"] ?: "", "Luxury"),
+                resale = mapInput(item["Resale"] ?: "", "Resale")
+            )
+        }
     }
 
+    fun main() {
+        val data = listOf(
+            mapOf(
+                "Car Brand" to "Abarth",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ac",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Aixam",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Very Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Alfa Romeo",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Alpine",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ariel",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Very Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Aston Martin",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Audi",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Austin",
+                "Use" to "General Use",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Bentley",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Bmw",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Bugatti",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Cadillac",
+                "Use" to "General Use",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Chevrolet",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Chrysler",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Citroen",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Corvette",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Cupra",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Dacia",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Daewoo",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Daf",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Daihatsu",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Daimler",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Datsun",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "De Tomaso",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Dfsk",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Dodge",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ds Automobiles",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ferrari",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Fiat",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ford",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Genesis Motor",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Gmc",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Great Wall",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Gwm Ora",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Very Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Hillman",
+                "Use" to "General Use",
+                "Price" to "Below £1000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Holden",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Honda",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Hummer",
+                "Use" to "Work Vehicle",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Hyundai",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Infiniti",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Isuzu",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Jaguar",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Jeep",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Jensen",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Kia",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Lagonda",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Lamborghini",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Land Rover",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Levc",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Very Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Lexus",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Lincoln",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Lotus",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Maserati",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Maxus",
+                "Use" to "Work Vehicle",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Maybach",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Mazda",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Mclaren",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Mg",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Mini",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Mitsubishi",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Moke",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Morgan",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Nissan",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Noble",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Opel",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Panther",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Perodua",
+                "Use" to "Commuting",
+                "Price" to "Below £1000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Peugeot",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Polaris",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Polestar",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Very Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Pontiac",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Porsche",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Very Important"
+            ),
+            mapOf(
+                "Car Brand" to "Proton",
+                "Use" to "Commuting",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Radical",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Very Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Renault",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Rolls-Royce",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Very Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Rover",
+                "Use" to "General Use",
+                "Price" to "£1000 to £10,000",
+                "Eco" to "Not Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Saab",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Saloon",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Seat",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Shelby",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Coupe",
+                "Performance" to "Very Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Skoda",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Smart",
+                "Use" to "Commuting",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Very Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Ssangyong",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Subaru",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Suzuki",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Hatchback",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            ),
+            mapOf(
+                "Car Brand" to "Tesla",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Very Important",
+                "Body" to "Saloon",
+                "Performance" to "Somewhat Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Volvo",
+                "Use" to "General Use",
+                "Price" to "£10,000 to £50,000",
+                "Eco" to "Somewhat Important",
+                "Body" to "Estate",
+                "Performance" to "Not Important",
+                "Luxury" to "Somewhat Important",
+                "Resale" to "Somewhat Important"
+            ),
+            mapOf(
+                "Car Brand" to "Zimmer",
+                "Use" to "Leisure and Recreation",
+                "Price" to "£50,000+",
+                "Eco" to "Not Important",
+                "Body" to "Other / No preference",
+                "Performance" to "Not Important",
+                "Luxury" to "Not Important",
+                "Resale" to "Not Important"
+            )
+        )
 
+        val carBrands = convertToCarBrandList(data)
 
-    fun loadModelFile(context: Context, modelName: String): MappedByteBuffer {
-        val fileDescriptor: AssetFileDescriptor = context.assets.openFd(modelName)
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel: FileChannel = inputStream.channel
-        val startOffset: Long = fileDescriptor.startOffset
-        val declaredLength: Long = fileDescriptor.declaredLength
+        val inputPreferences = listOf(
+            Pair("Use", "Commuting"),
+            Pair("Price", "£50,000+"),
+            Pair("Eco", "Very Important"),
+            Pair("Body", "Coupe"),
+            Pair("Performance", "Very Important"),
+            Pair("Luxury", "Somewhat Important")
+        )
 
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+        val rankedCarBrands = predictCarBrands(inputPreferences, carBrands)
+        val rankedCarBrandNames = rankedCarBrands.map { it.name }
+        println("RANKED: $rankedCarBrandNames")
     }
 
 }
+
+data class CarBrand(
+    val name: String,
+    val use: Double,
+    val price: Double,
+    val body: Double,
+    val eco: Double,
+    val performance: Double,
+    val luxury: Double,
+    val resale: Double
+)

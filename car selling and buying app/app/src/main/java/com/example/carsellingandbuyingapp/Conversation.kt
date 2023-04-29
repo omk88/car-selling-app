@@ -1,3 +1,4 @@
+
 package com.example.carsellingandbuyingapp
 
 import android.util.Base64
@@ -103,7 +104,6 @@ class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback 
         setContentView(R.layout.activity_conversation)
 
         /*secretKey = AESHelper.generateKey() as SecretKeySpec
-
         val ivSize = 16
         val random = SecureRandom()
         iv = ByteArray(ivSize)

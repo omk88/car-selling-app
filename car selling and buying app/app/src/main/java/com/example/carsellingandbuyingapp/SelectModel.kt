@@ -174,6 +174,15 @@ class SelectModel : AppCompatActivity() {
                     val imageUri1 = intent.getStringExtra("imageUri1")
                     val imageUri2 = intent.getStringExtra("imageUri2")
                     val description = intent.getStringExtra("description")
+
+                    val make = intent.getStringExtra("make")
+                    val model = intent.getStringExtra("model")
+                    val colour = intent.getStringExtra("colour")
+                    val year = intent.getStringExtra("year")
+
+                    println("MAKE GOT" + make)
+
+
                     val intent = Intent(this@SelectModel, SellCar2::class.java)
                     intent.putExtra("selected_model", textView.text.toString())
                     intent.putExtra("carText", carText)
@@ -185,6 +194,15 @@ class SelectModel : AppCompatActivity() {
                     intent.putExtra("condition", condition)
                     intent.putExtra("mileage", mileage)
                     intent.putExtra("description", description)
+
+
+
+                    intent.putExtra("make", make)
+                    intent.putExtra("model", model)
+                    intent.putExtra("condition", condition)
+                    intent.putExtra("colour", colour)
+                    intent.putExtra("year", year)
+
                     startActivity(intent)
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
                 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import com.bumptech.glide.Glide
@@ -84,6 +85,17 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         viewHolder.textView7.text = item.text7
         viewHolder.removeButton.visibility = View.INVISIBLE
         viewHolder.soldButton.visibility = View.INVISIBLE
+
+        if (item.priceType == "Great Price") {
+            viewHolder.greatPrice.visibility = View.VISIBLE
+        } else if (item.priceType == "Good Price") {
+            viewHolder.goodPrice.visibility = View.VISIBLE
+        } else if (item.priceType == "Fair Price") {
+            viewHolder.fairPrice.visibility = View.VISIBLE
+        } else if (item.priceType == "Bad Price") {
+            viewHolder.badPrice.visibility = View.VISIBLE
+        }
+
 
         Glide.with(context)
             .load(item.image1Url)
@@ -196,6 +208,10 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
         val textView7: TextView = view.findViewById(R.id.reg)
         val removeButton = view.findViewById<ImageView>(R.id.removeButton)
         val soldButton = view.findViewById<ImageView>(R.id.soldButton)
+        val greatPrice = view.findViewById<LinearLayout>(R.id.greatPrice)
+        val goodPrice = view.findViewById<LinearLayout>(R.id.goodPrice)
+        val fairPrice = view.findViewById<LinearLayout>(R.id.fairPrice)
+        val badPrice = view.findViewById<LinearLayout>(R.id.badPrice)
     }
 }
 

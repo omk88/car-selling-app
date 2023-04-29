@@ -37,7 +37,7 @@
             android:fontFamily="@font/poppins_regular"
             android:gravity="center"
             android:padding="25dp"
-            android:text="How important is the car's resale value to you?"
+            android:text="How important is the cars resale value to you?"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

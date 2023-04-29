@@ -40,9 +40,9 @@ class SellCar : AppCompatActivity() {
             condition = radioButton.text
         }
 
-        val priceText = findViewById<EditText>(R.id.editTextCarPrice)
+        //val priceText = findViewById<EditText>(R.id.editTextCarPrice)
 
-        priceText.addTextChangedListener(object : TextWatcher {
+        /*priceText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 if (s.isNotEmpty() && s.toString().substring(0, 1) == "£" && count == 1 && after == 0) {
                     priceText.setText("£")
@@ -58,13 +58,13 @@ class SellCar : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable) {}
-        })
+        })*/
     }
 
     fun switchToSellCar2(view: View) {
         val regText = findViewById<EditText>(R.id.editTextCarRegistration)
         val mileageText = findViewById<EditText>(R.id.editTextCarMileage)
-        val priceText = findViewById<EditText>(R.id.editTextCarPrice)
+        //val priceText = findViewById<EditText>(R.id.editTextCarPrice)
         val description = findViewById<EditText>(R.id.description)
 
         val username = intent.getStringExtra("username")
@@ -72,7 +72,7 @@ class SellCar : AppCompatActivity() {
         val intent = Intent(this, SellCar2::class.java)
         intent.putExtra("registration", regText.text.toString())
         intent.putExtra("mileage", mileageText.text.toString())
-        intent.putExtra("price", priceText.text.toString())
+        //intent.putExtra("price", priceText.text.toString())
         intent.putExtra("username", username)
         intent.putExtra("description", description.text.toString())
 

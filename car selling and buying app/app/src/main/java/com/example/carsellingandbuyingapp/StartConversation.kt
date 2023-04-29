@@ -277,7 +277,7 @@ class StartConversation : AppCompatActivity() {
                     val username = userSnapshot.key
                     if (username != null) {
                         if (username != loggedInUser.username)
-                        usernames.add(username)
+                            usernames.add(username)
                     }
                 }
                 usernamesAdapter = UsernamesAdapter(this@StartConversation, usernames)
@@ -295,7 +295,7 @@ class ConversationAdapter(
     context: Context,
     private val messages: ArrayList<String>,
     private val welcomeTextView: TextView
-    ) :
+) :
     ArrayAdapter<String>(context, R.layout.user_item, messages) {
 
     private val currentMessages = ArrayList<String>()

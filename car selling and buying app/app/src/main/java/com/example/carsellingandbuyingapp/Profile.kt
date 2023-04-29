@@ -18,6 +18,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -125,11 +126,35 @@ class Profile : AppCompatActivity() {
             }
         }
 
+        val banner = findViewById<ImageView>(R.id.banner)
+        val profilePicture = findViewById<ImageView>(R.id.profilePicture)
+
+        val bannerUriIntent = intent.getStringExtra("bannerUri")?.toUri()
+        val profileUriIntent = intent.getStringExtra("profileUri")?.toUri()
+
+        Glide.with(this)
+            .load(bannerUriIntent)
+            .into(banner)
+
+        Glide.with(this)
+            .load(profileUriIntent)
+            .into(profilePicture)
+
+        if (bannerUriIntent != null) {
+            Glide.with(this)
+                .load(bannerUriIntent)
+                .into(banner)
+
+            Glide.with(this)
+                .load(profileUriIntent)
+                .into(profilePicture)
+        } else {
+
+        }
+
         val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
         fadeInAnim.duration = 100
 
-        val banner = findViewById<ImageView>(R.id.banner)
-        val profilePicture = findViewById<ImageView>(R.id.profilePicture)
 
         var bannerUri = ""
         var profilePictureUri = ""
@@ -416,6 +441,7 @@ class Profile : AppCompatActivity() {
                 val emissions = snapshot.child("co2Emissions").value.toString()
                 val engineCapacity = snapshot.child("engineCapacity").value.toString()
                 val fuelType = snapshot.child("fuelType").value.toString()
+                val priceType = snapshot.child("priceType").value.toString()
 
                 val regex = Regex(",\\s*([a-zA-Z]+)\\s*[a-zA-Z]*\\s*\\d")
                 val matchResult = regex.find(snapshot.child("address").value.toString())
@@ -446,8 +472,8 @@ class Profile : AppCompatActivity() {
                                 mileage,
                                 address,
                                 condition,
-                                registration
-                            )
+                                registration,
+                                priceType)
 
                             database.child(item.text7).get().addOnSuccessListener {
                                 if (it.exists()) {

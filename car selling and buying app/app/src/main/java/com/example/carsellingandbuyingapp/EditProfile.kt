@@ -9,18 +9,20 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.view.animation.AlphaAnimation
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -36,6 +38,7 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 class EditProfile : AppCompatActivity(), View.OnClickListener {
 
@@ -51,7 +54,9 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
         val username = intent.getStringExtra("username").toString()
 
-        val saveDetails = findViewById<Button>(R.id.saveDetails)
+        val saveDetails = findViewById<LinearLayout>(R.id.saveDetails)
+
+        val loggedInUser = application as Username
 
         saveDetails.setOnClickListener {
             lifecycleScope.launch {
@@ -82,15 +87,51 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
         banner.setOnClickListener(this)
         profilePicture.setOnClickListener(this)
 
-        val bannerImageUri = Uri.parse(intent.getStringExtra("bannerUri"))
-        Glide.with(this)
-            .load(bannerImageUri)
-            .into(banner)
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 100
 
-        val profilePictureImageUri = Uri.parse(intent.getStringExtra("profilePictureUri"))
-        Glide.with(this)
-            .load(profilePictureImageUri)
-            .into(profilePicture)
+        val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-" + loggedInUser.username)
+        val bannerPictureRef = Firebase.storage.reference.child("images/banner-" + loggedInUser.username)
+
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(this)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.profile_picture)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.03f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        profilePicture.setImageBitmap(resource)
+                        profilePicture.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
+
+        bannerPictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(this)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.banner)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.1f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        banner.setImageBitmap(resource)
+                        banner.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
+    }
+
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
     }
 
     override fun onClick(view: View?) {
@@ -185,19 +226,20 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
             val intent = Intent(this@EditProfile, Profile::class.java)
             intent.putExtra("username", username)
+            intent.putExtra("editted", "editted")
+            intent.putExtra("profileUri", profilePictureUri)
+            intent.putExtra("bannerUri", bannerUri)
             startActivity(intent)
             overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
             Toast.makeText(this@EditProfile, "Saved Details!", Toast.LENGTH_SHORT).show()
+
+            setResult(Activity.RESULT_OK)
+            finish()
         } else {
             // Handle failed uploads
             Toast.makeText(this@EditProfile, "Failed to save details.", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
-
-
 
     private suspend fun uploadSingleImage(
         uri: Uri?,
@@ -219,7 +261,7 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
 
         val compressedImage = compressImage(uri, contentResolver)
         val bitmap = BitmapFactory.decodeByteArray(compressedImage, 0, compressedImage.size)
-        val resizedBitmap = resizeImage(bitmap, maxWidth = 800, maxHeight = 800)
+        val resizedBitmap = resizeImage(bitmap, maxWidth = 600, maxHeight = 600)
 
         val outputStream = ByteArrayOutputStream()
         resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
@@ -227,7 +269,7 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    private fun compressImage(uri: Uri, contentResolver: ContentResolver, quality: Int = 75): ByteArray {
+    private fun compressImage(uri: Uri, contentResolver: ContentResolver, quality: Int = 30): ByteArray {
         val inputStream = contentResolver.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(inputStream)
         val outputStream = ByteArrayOutputStream()

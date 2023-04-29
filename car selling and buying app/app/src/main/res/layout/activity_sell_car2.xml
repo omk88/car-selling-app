@@ -129,7 +129,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="225dp"
             android:layout_margin="8dp"
             android:padding="10dp"
             app:cardBackgroundColor="#f5f7fa"
@@ -142,7 +142,7 @@
             <LinearLayout
                 android:id="@+id/linearLayout25"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_margin="7dp"
                 android:background="@drawable/edit_text_background"
                 android:orientation="vertical"
@@ -154,14 +154,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <TextView
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:paddingRight="17dp"
+                        android:layout_weight="1"
                         android:id="@+id/textView3"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
-                        android:padding="17dp"
+                        android:paddingLeft="17dp"
                         android:text="TextView"
                         android:textColor="#848884"
                         android:textSize="14sp" />
@@ -347,25 +351,67 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/textView7"
+                    <LinearLayout
+                        android:layout_marginTop="20dp"
+                        android:paddingLeft="9dp"
+                        android:paddingRight="9dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_regular"
-                        android:padding="9dp"
-                        android:text="*File format: PNG, JPEG."
-                        android:textColor="#848884"
-                        android:textSize="14sp" />
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/errorMessage"
+                        <TextView
+                            android:paddingLeft="9dp"
+                            android:paddingRight="9dp"
+                            android:layout_weight="1"
+                            android:id="@+id/recommendPriceText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_regular"
+                            android:text="Recommended Price:"
+                            android:textColor="#848884"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:paddingLeft="9dp"
+                            android:paddingRight="9dp"
+                            android:layout_weight="1"
+                            android:id="@+id/recommendPrice"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/poppins_regular"
+                            android:text="£0"
+                            android:textColor="#848884"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_regular"
-                        android:padding="9dp"
-                        android:text="One or more of the images you uploaded is not a car! Try uploading another image."
-                        android:textColor="#FF0000"
-                        android:textSize="14sp" />
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/editTextCarPrice"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:background="@drawable/edit_text_background"
+                            android:ems="10"
+                            android:fontFamily="@font/poppins_regular"
+                            android:hint="Price"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:paddingLeft="15dp"
+                            android:paddingTop="7.5dp"
+                            android:paddingBottom="5.5dp"
+                            android:textColor="#803B3B3B"
+                            android:textCursorDrawable="@drawable/cursor_color"
+                            android:textSize="16sp"
+                            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
+                            app:layout_constraintBottom_toTopOf="@+id/editTextCarMileage"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />
+                    </LinearLayout>
 
                 </LinearLayout>
             </LinearLayout>

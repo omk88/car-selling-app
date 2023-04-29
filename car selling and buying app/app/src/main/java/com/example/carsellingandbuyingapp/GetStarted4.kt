@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.firebase.database.ktx.database
@@ -35,6 +32,7 @@ class GetStarted4 : AppCompatActivity() {
         skip.setOnClickListener {
             completePreferences()
             val intent = Intent(this@GetStarted4, MainPage::class.java)
+
             startActivity(intent)
             overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
         }
@@ -54,6 +52,15 @@ class GetStarted4 : AppCompatActivity() {
                 override fun onAnimationEnd(animation: Animation) {
                     container.visibility = View.GONE
                     val intent = Intent(this@GetStarted4, GetStarted5::class.java)
+
+                    val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+                    val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+
+                    if (selectedRadioButtonId != -1) {
+                        val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                        val selectedValue = selectedRadioButton.text.toString()
+                        intent.putExtra("Price", selectedValue)
+                    } else { }
                     intent.putExtra("progressButton", "next")
                     startActivity(intent)
                 }

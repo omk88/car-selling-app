@@ -6,10 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.firebase.database.ktx.database
@@ -55,6 +52,17 @@ class GetStarted3 : AppCompatActivity() {
                 override fun onAnimationEnd(animation: Animation) {
                     container.visibility = View.GONE
                     val intent = Intent(this@GetStarted3, GetStarted4::class.java)
+
+                    val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+                    val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+
+                    if (selectedRadioButtonId != -1) {
+                        val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                        val selectedValue = selectedRadioButton.text.toString()
+                        intent.putExtra("Seats", selectedValue)
+                    } else { }
+
+
                     intent.putExtra("progressButton", "next")
                     startActivity(intent)
                 }

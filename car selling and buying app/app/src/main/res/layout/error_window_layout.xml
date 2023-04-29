@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <androidx.cardview.widget.CardView
+        android:gravity="center"
+        android:layout_width="350dp"
+        android:layout_height="450dp"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="#f5f7fa"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="20dp"
+        android:id="@+id/cardView">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/error"
+                android:layout_width="match_parent"
+                android:layout_height="257dp"
+                android:adjustViewBounds="true"
+                android:padding="130dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/error" />
+
+            <TextView
+                android:id="@+id/congrats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:gravity="center"
+                android:text="Wrong Image!"
+                android:textColor="#898989"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/awardText"
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:fontFamily="@font/poppins_regular"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="You can only upload images of cars."
+                android:textColor="#898989"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="68dp"
+                android:orientation="vertical"
+                android:paddingLeft="60dp"
+                android:paddingTop="5dp"
+                android:paddingRight="60dp"
+                android:paddingBottom="5dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/dismiss"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginBottom="64dp"
+                    android:background="@drawable/button_background"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="center"
+                    android:text="Dismiss"
+                    android:textColor="#36454F"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.519"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</LinearLayout>
