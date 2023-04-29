@@ -9,12 +9,74 @@
     android:id="@+id/activity_root">
 
     <LinearLayout
+        android:id="@+id/linearLayout21"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#E0E0E0"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <LinearLayout
+            android:id="@+id/goBack"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/profile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/poppins_regular"
+                android:gravity="center"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
+                android:text="Profile"
+                android:textColor="#898989"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="49dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:orientation="horizontal">
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout27"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout21">
+
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/banner" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -22,21 +84,11 @@
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container1"
+                style="@style/Shimmer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                style="@style/Shimmer">
+                android:layout_height="match_parent">
 
             </com.facebook.shimmer.ShimmerFrameLayout>
-
-            <ImageView
-                android:id="@+id/banner"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/banner" />
 
         </FrameLayout>
     </LinearLayout>
@@ -58,22 +110,22 @@
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/linearLayout21">
 
 
         <LinearLayout
             android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_horizontal"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,9 +145,8 @@
                     android:id="@+id/linearLayout8"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_weight="1">
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:orientation="horizontal"></LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layoutProfilePicture"
@@ -109,22 +160,22 @@
 
                         <com.facebook.shimmer.ShimmerFrameLayout
                             android:id="@+id/shimmer_view_container2"
+                            style="@style/Shimmer"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            style="@style/Shimmer">
+                            android:layout_height="match_parent">
 
                         </com.facebook.shimmer.ShimmerFrameLayout>
 
                         <de.hdodenhof.circleimageview.CircleImageView
-                            android:layout_gravity="center_horizontal"
                             android:id="@+id/profilePicture"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@drawable/profile_picture"
+                            android:layout_gravity="center_horizontal"
+                            android:padding="10dp"
                             android:scaleType="centerCrop"
+                            android:src="@drawable/profile_picture"
                             app:civ_border_color="#E7E7E7"
-                            app:civ_border_width="3dp"
-                            android:padding="10dp" />
+                            app:civ_border_width="3dp" />
                     </FrameLayout>
                 </LinearLayout>
 
@@ -132,8 +183,8 @@
                     android:id="@+id/linearLayout9"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:orientation="horizontal" />
 
             </LinearLayout>
 
@@ -152,8 +203,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical">
-            </LinearLayout>
+                android:orientation="vertical"></LinearLayout>
 
             <LinearLayout
                 android:id="@+id/linearLayout10"
@@ -191,7 +241,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="vertical"/>
+                android:orientation="vertical" />
 
         </LinearLayout>
 
@@ -213,79 +263,77 @@
                     android:id="@+id/linearLayout17"
                     android:layout_width="35dp"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                </LinearLayout>
+                    android:orientation="horizontal"></LinearLayout>
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/verifiedPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/smartphone" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/verifiedEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/email" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/ecoBadge1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/badge" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/ecoBadge2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/earth" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/ecoBadge3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/ecofriendly" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/salesBadge1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/trophy0" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/salesBadge2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/trophy1" />
 
                 <ImageView
-                    android:padding="10dp"
                     android:id="@+id/salesBadge3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:padding="10dp"
                     app:srcCompat="@drawable/trophy2" />
 
                 <LinearLayout
                     android:id="@+id/linearLayout18"
                     android:layout_width="35dp"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                </LinearLayout>
+                    android:orientation="horizontal"></LinearLayout>
 
             </LinearLayout>
 
@@ -306,7 +354,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
-        app:layout_constraintVertical_bias="0.059">
+        app:layout_constraintVertical_bias="0.274">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -332,7 +380,8 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout22"
+        android:visibility="gone"
+        android:id="@+id/messageAndCall"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"
@@ -423,6 +472,5 @@
         app:labelVisibilityMode="labeled" >
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

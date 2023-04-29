@@ -1,20 +1,16 @@
 package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
+import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.widget.*
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.core.view.GravityCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -23,8 +19,15 @@ import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.File
-import java.util.ArrayList
+import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import java.util.*
 
 class MainPage : AppCompatActivity() {
 
@@ -32,6 +35,128 @@ class MainPage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
+
+        val tfliteModel = loadModelFile(this, "price_recommendation_model.tflite")
+        val tflite = Interpreter(tfliteModel)
+
+        var colour = "Red"
+        var condition = "Spares Or Repairs"
+        var make = "Ford"
+        var model = "Focus"
+        var mileage = 0
+        var yearOfManufacture = 2000
+        
+
+        val colours = listOf("Black", "Blue", "Grey", "Red", "Silver", "White")
+        val conditions = listOf("Good Condition", "Perfect Condition", "Poor Condition", "Spares Or Repairs")
+        val makes = resources.getStringArray(R.array.make_items_2).toList()
+        val models = resources.getStringArray(R.array.model_items).toList()
+
+        val colourEncoded = oneHotEncode(colour, colours)
+        val conditionEncoded = oneHotEncode(condition, conditions)
+        val makeEncoded = oneHotEncode(make, makes)
+        val modelEncoded = oneHotEncode(model, models)
+
+        val scaledMileage = standardize(mileage.toDouble(), 356243.1805, 171069.5643724576)
+        val scaledYearOfManufacture = standardize(yearOfManufacture.toDouble(), 1987.391, 12.732875519693106)
+
+
+        println("Colour encoded length: ${colourEncoded.size}")
+        println("Condition encoded length: ${conditionEncoded.size}")
+        println("Make encoded length: ${makeEncoded.size}")
+        println("Model encoded length: ${modelEncoded.size}")
+
+        val mileageMean = 354108.950375
+        val mileageStd = 171900.9895738319
+        val yearOfManufactureMean = 1987.5845
+        val yearOfManufactureStd = 12.89848284683125
+
+        //val scaledMileage = (mileage - mileageMean) / mileageStd
+        //val scaledYearOfManufacture = (yearOfManufacture - yearOfManufactureMean) / yearOfManufactureStd
+
+        val currentYear = 2023
+        val age = currentYear - yearOfManufacture
+        val ageWeight = 0
+        val weightedAge = age * ageWeight
+        val ageSquared = weightedAge * weightedAge
+
+
+
+        val inputArray = floatArrayOf(
+            *colourEncoded.copyOfRange(0, colourEncoded.size),
+            *conditionEncoded.copyOfRange(0, conditionEncoded.size),
+            *makeEncoded.copyOfRange(0, makeEncoded.size),
+            *modelEncoded.copyOfRange(0, modelEncoded.size),
+            scaledMileage,
+            scaledYearOfManufacture
+        )
+
+        println("TEST"+modelEncoded.contentToString())
+
+
+        val correctedInputArray = floatArrayOf(
+            *colourEncoded.copyOfRange(0, colourEncoded.size),
+            *conditionEncoded.copyOfRange(0, conditionEncoded.size),
+            *makeEncoded.copyOfRange(0, makeEncoded.size),
+            *modelEncoded.copyOfRange(0, modelEncoded.size),
+            scaledMileage,
+            scaledYearOfManufacture
+        )
+
+
+
+        val inputTensor = tflite.getInputTensor(0)
+        val inputShape = inputTensor.shape()
+        val inputSize = inputTensor.numBytes()
+
+
+        println("Input tensor shape: ${inputShape.contentToString()}")
+        println("Input array shape: ${inputArray.size}")
+
+
+        val inputBuffer = ByteBuffer.allocateDirect(inputSize)
+            .order(ByteOrder.nativeOrder())
+
+        val expectedInputArrayLength = inputShape[1]
+
+        if (correctedInputArray.size != expectedInputArrayLength) {
+            throw RuntimeException("Input array length (${inputArray.size}) does not match the expected length ($expectedInputArrayLength)")
+        }
+
+
+        inputBuffer.asFloatBuffer().put(inputArray)
+        //inputBuffer.rewind()
+
+
+        val outputShape = tflite.getOutputTensor(0).shape()
+        val outputDataType = tflite.getOutputTensor(0).dataType()
+        val outputBuffer = TensorBuffer.createFixedSize(outputShape, outputDataType)
+
+        tflite.run(inputBuffer, outputBuffer.buffer)
+        val outputArray = outputBuffer.floatArray
+
+/*
+        if (condition == "Poor Condition") {
+            println("Predicted price: ${outputArray[0]*100}")
+        } else if (condition == "Spares Or Repairs") {
+            println("Predicted price: ${outputArray[0]*10}")
+        } else if (condition == "Good Condition") {
+
+        }
+*/
+
+        println("Predicted price: ${outputArray[0]}")
+
+        println("Kotlin preprocessed input array: ${correctedInputArray.contentToString()}")
+
+        println("Colour encoded: ${colourEncoded.contentToString()}")
+        println("Condition encoded: ${conditionEncoded.contentToString()}")
+        println("Make encoded: ${makeEncoded.contentToString()}")
+        println("Model encoded: ${modelEncoded.contentToString()}")
+
+
+
+
 
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
@@ -313,4 +438,30 @@ class MainPage : AppCompatActivity() {
         file.writeBytes(bytes)
         return Uri.fromFile(file)
     }
+
+    fun oneHotEncode(value: String, categories: List<String>): FloatArray {
+        val index = categories.indexOf(value)
+        val encoded = FloatArray(categories.size) { 0.0f }
+        if (index >= 0 && index < categories.size) {
+            encoded[index] = 1.0f
+        }
+        return encoded
+    }
+
+    fun standardize(value: Double, mean: Double, std: Double): Float {
+        return ((value - mean) / std).toFloat()
+    }
+
+
+
+    fun loadModelFile(context: Context, modelName: String): MappedByteBuffer {
+        val fileDescriptor: AssetFileDescriptor = context.assets.openFd(modelName)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel: FileChannel = inputStream.channel
+        val startOffset: Long = fileDescriptor.startOffset
+        val declaredLength: Long = fileDescriptor.declaredLength
+
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
 }

@@ -66,11 +66,27 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
     private lateinit var selectModel: EditText
     private val img_height = 224
     private val img_width = 224
+    private lateinit var errorMessage: TextView
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sell_car2)
+
+        val loggedInUser = application as Username
+
+        val goBack = findViewById<LinearLayout>(R.id.goBack)
+
+        goBack.setOnClickListener {
+            val intent = Intent(this, SellCar::class.java)
+            intent.putExtra("username", loggedInUser.username)
+            startActivity(intent)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
+        }
+
+        errorMessage = findViewById(R.id.errorMessage)
+        errorMessage.visibility = View.GONE
 
         initTfliteInterpreter("car_classifier_model.tflite")
 
@@ -96,6 +112,8 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
         val condition = intent.getStringExtra("condition")
         val price = intent.getStringExtra("price")
         val mileage = intent.getStringExtra("mileage")
+        val description = intent.getStringExtra("description")
+        println("DESCC"+ description)
 
         if (intent.getStringExtra("selected_model") != null) {
             selectModel.setText(intent.getStringExtra("selected_model").toString())
@@ -119,6 +137,7 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
             intent.putExtra("price", price)
             intent.putExtra("condition", condition)
             intent.putExtra("mileage", mileage)
+            intent.putExtra("description", description)
             intent.putExtra("page", "sellCar")
             intent.putExtra("carText", textView.text)
             intent.putExtra("registration", vehicleData?.registrationNumber.toString())
@@ -317,9 +336,6 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
         val intent = intent
         val registration = intent.getStringExtra("registration")
         var storageRef = Firebase.storage.reference
-        var pd = ProgressDialog(this@SellCar2)
-        pd.setTitle("Posting Car...")
-        pd.show()
 
         val carImage0 = storageRef.child("images/image0-$registration")
         val carImage1 = storageRef.child("images/image1-$registration")
@@ -340,31 +356,39 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
                 val classification = classifyImage(bitmap)
                 println("ImageClassification Image $i classification: $classification")
 
-                val compressedAndResizedImage = compressAndResizeImage(uri)
-                val uploadTask = images[i].putBytes(compressedAndResizedImage)
+                if (classification == "Not Car") {
+                    errorMessage.visibility = View.VISIBLE
+                } else {
+                    var pd = ProgressDialog(this@SellCar2)
+                    pd.setTitle("Posting Car...")
+                    pd.show()
 
-                uploadTask.addOnSuccessListener {
-                    images[i].downloadUrl.addOnSuccessListener { _ ->
-                        if (successfulUploads.incrementAndGet() == 3) {
-                            val loggedInUser = application as Username
-                            val user = loggedInUser.username
-                            val database = Firebase.database.getReference("users")
-                            database.child(user).get().addOnSuccessListener { dataSnapshot ->
-                                if (dataSnapshot.exists()) {
-                                    val address = dataSnapshot.child("address").value.toString()
-                                    val intent = Intent(this, MainPage::class.java)
-                                    intent.putExtra("address", address)
-                                    startActivity(intent)
-                                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
-                                    pd.dismiss()
-                                    Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                    val compressedAndResizedImage = compressAndResizeImage(uri)
+                    val uploadTask = images[i].putBytes(compressedAndResizedImage)
+
+                    uploadTask.addOnSuccessListener {
+                        images[i].downloadUrl.addOnSuccessListener { _ ->
+                            if (successfulUploads.incrementAndGet() == 3) {
+                                val loggedInUser = application as Username
+                                val user = loggedInUser.username
+                                val database = Firebase.database.getReference("users")
+                                database.child(user).get().addOnSuccessListener { dataSnapshot ->
+                                    if (dataSnapshot.exists()) {
+                                        val address = dataSnapshot.child("address").value.toString()
+                                        val intent = Intent(this, MainPage::class.java)
+                                        intent.putExtra("address", address)
+                                        startActivity(intent)
+                                        overridePendingTransition(androidx.appcompat.R.anim.abc_fade_out, androidx.appcompat.R.anim.abc_fade_in)
+                                        pd.dismiss()
+                                        Toast.makeText(this, "Car Posted!", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             }
                         }
+                    }.addOnFailureListener { exception ->
+                        // Handle unsuccessful uploads
+                        Toast.makeText(applicationContext, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                     }
-                }.addOnFailureListener { exception ->
-                    // Handle unsuccessful uploads
-                    Toast.makeText(applicationContext, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -388,6 +412,8 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
                 val registrationYear = vehicleData?.registrationYear
                 val taxDueDate = vehicleData?.taxDueDate
                 val mileage = intent.getStringExtra("mileage")
+                val description = intent.getStringExtra("description")
+                println("DESCC"+ description)
                 val yearOfManufacture = vehicleData?.yearOfManufacture
                 val price = intent.getStringExtra("price")
                 val model = selectModel.text.toString()
@@ -396,7 +422,7 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
                 val username = user
                 val condition = intent.getStringExtra("condition")
 
-                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, user, address, condition, co2Emissions, engineCapacity)
+                val car = Car(registration, make, colour, fuelType, registrationYear, taxDueDate, mileage.toString(), yearOfManufacture, price, model, user, address, condition, co2Emissions, engineCapacity, description.toString())
                 databaseCars.child(registration.toString()).setValue(car).addOnSuccessListener { println("DONE!!") }.addOnFailureListener { println("FAILED :(") }
             }
         }.addOnFailureListener{}
@@ -439,7 +465,6 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
 
     fun switchToSellCar3(view: View) {
         val mileage = intent.getStringExtra("mileage").toString()
-        val model = intent.getStringExtra("model").toString()
         val price = intent.getStringExtra("price").toString()
         val username = intent.getStringExtra("username").toString()
         val condition = intent.getStringExtra("condition").toString()
@@ -455,7 +480,6 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
         intent.putExtra("yearOfManufacture", vehicleData?.yearOfManufacture)
         intent.putExtra("co2Emissions", vehicleData?.co2Emissions)
         intent.putExtra("engineCapacity", vehicleData?.engineCapacity)
-        intent.putExtra("model", model)
         intent.putExtra("price", price)
         intent.putExtra("username", username)
         intent.putExtra("condition", condition)

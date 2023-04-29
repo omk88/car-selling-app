@@ -61,6 +61,7 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
         val price = findViewById<TextView>(R.id.priceText)
         val co2EmissionsText = findViewById<TextView>(R.id.co2Text)
         val engineCapacity = findViewById<TextView>(R.id.engineText)
+        val description = findViewById<TextView>(R.id.descriptionText)
 
         userText.setOnClickListener{
             val username = userText.text.toString()
@@ -225,6 +226,7 @@ class CarSalePage : AppCompatActivity(), OnMapReadyCallback {
                 colourText.setText(it.child("colour").value.toString().lowercase().capitalize())
                 co2EmissionsText.setText(it.child("co2Emissions").value.toString())
                 engineCapacity.setText(it.child("engineCapacity").value.toString())
+                description.setText(it.child("description").value.toString())
 
                 if(it.child("make").value.toString().split(" ").size == 2) {
                     textView.setText(

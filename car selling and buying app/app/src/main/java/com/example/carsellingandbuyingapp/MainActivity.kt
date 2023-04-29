@@ -1,6 +1,5 @@
 package com.example.carsellingandbuyingapp
 
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +10,12 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.common.FileUtil
+import smile.data.DataFrame
+import smile.data.type.DataTypes
+import java.io.FileInputStream
+import java.nio.channels.FileChannel
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         val signUpButton = findViewById<TextView>(R.id.signUpNow)
         signUpButton.setOnClickListener{

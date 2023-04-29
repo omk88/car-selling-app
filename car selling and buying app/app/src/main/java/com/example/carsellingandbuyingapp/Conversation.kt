@@ -93,8 +93,8 @@ class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback 
     var imageLocation: String = ""
     lateinit var attachImage: ImageView
     var imageUri: Uri? = null
-    var secretKey = SecretKeySpec("your-secret-key-here".toByteArray(), "AES")
-    var iv = "your-iv-here".toByteArray()
+    var secretKey = SecretKeySpec("placeholder-key".toByteArray(), "AES")
+    var iv = "place-holder-iv".toByteArray()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("MissingInflatedId")
@@ -104,7 +104,7 @@ class Conversation : AppCompatActivity(), MessageAdapter.OnMessageAddedCallback 
 
         /*secretKey = AESHelper.generateKey() as SecretKeySpec
 
-        val ivSize = 16 // AES block size is 128 bits = 16 bytes
+        val ivSize = 16
         val random = SecureRandom()
         iv = ByteArray(ivSize)
         random.nextBytes(iv)*/

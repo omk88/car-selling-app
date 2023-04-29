@@ -182,7 +182,7 @@
 
                 <EditText
                     android:gravity="start|top"
-                    android:id="@+id/editTextCarModel"
+                    android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/edit_text_background"

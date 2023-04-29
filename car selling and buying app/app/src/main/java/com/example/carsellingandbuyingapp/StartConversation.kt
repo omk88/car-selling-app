@@ -20,25 +20,16 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.File
 import java.nio.charset.StandardCharsets
-import java.security.SecureRandom
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 class StartConversation : AppCompatActivity() {
@@ -49,6 +40,7 @@ class StartConversation : AppCompatActivity() {
     private lateinit var usernamesListView: ListView
     private val conversationIndexMap = HashMap<String, Int>()
     private lateinit var welcomeTextView: TextView
+    var showWelcomeText: Int = 1
     var secretKey = SecretKeySpec("your-secret-key-here".toByteArray(), "AES")
     var iv = "your-iv-here".toByteArray()
 
@@ -65,18 +57,55 @@ class StartConversation : AppCompatActivity() {
         val ivBytes = hardcodedIv.toByteArray(StandardCharsets.UTF_8)
         iv = ivBytes
 
+        val loggedInUser = application as Username
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.navBar)
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.profile -> {
+                    val intent = Intent(this@StartConversation, Profile::class.java)
+                    intent.putExtra("username", loggedInUser.username)
+                    intent.putExtra("bannerUri", loggedInUser.bannerUri)
+                    intent.putExtra("profilePictureUri", loggedInUser.profilePictureUri)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.map -> {
+                    val intent = Intent(this@StartConversation, MapsPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.browse -> {
+                    val intent = Intent(this, MainPage::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.sellCar -> {
+                    val intent = Intent(this@StartConversation, SellCar::class.java)
+                    intent.putExtra("username", loggedInUser.username)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                R.id.messages -> {
+                    val intent = Intent(this@StartConversation, StartConversation::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
+                    true
+                }
+                else -> false
+            }
+        }
+
         welcomeTextView = findViewById(R.id.welcome)
 
-        val loggedInUser = application as Username
 
         val username = findViewById<EditText>(R.id.username)
         val close = findViewById<LinearLayout>(R.id.close)
         val dummyView = findViewById<FrameLayout>(R.id.dummy_view)
-
-        close.setOnClickListener {
-            dummyView.requestFocus()
-            welcomeTextView.visibility = View.VISIBLE
-        }
 
         close.visibility = View.GONE
 
@@ -94,6 +123,11 @@ class StartConversation : AppCompatActivity() {
 
 
         usernamesListView = findViewById(R.id.messageList2)
+
+
+        close.setOnClickListener {
+            dummyView.requestFocus()
+        }
 
         username.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -158,6 +192,7 @@ class StartConversation : AppCompatActivity() {
                 conversationAdapter!!.addLastMessage(lastMessage)
                 conversationAdapter!!.addMessageCount(messagesCount)
                 conversationAdapter!!.notifyDataSetChanged()
+                welcomeTextView.visibility = View.GONE
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -229,14 +264,11 @@ class StartConversation : AppCompatActivity() {
         }
     }
 
-
-
-
-
     fun getUsernames() {
         val database = FirebaseDatabase.getInstance()
         val query: Query = database.reference.child("users")
         val usernames = ArrayList<String>()
+        val loggedInUser = application as Username
 
         query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -244,6 +276,7 @@ class StartConversation : AppCompatActivity() {
                 for (userSnapshot in dataSnapshot.children) {
                     val username = userSnapshot.key
                     if (username != null) {
+                        if (username != loggedInUser.username)
                         usernames.add(username)
                     }
                 }
@@ -256,12 +289,13 @@ class StartConversation : AppCompatActivity() {
             }
         })
     }
-
-
-
 }
 
-class ConversationAdapter(context: Context, private val messages: ArrayList<String>, private val welcomeTextView: TextView) :
+class ConversationAdapter(
+    context: Context,
+    private val messages: ArrayList<String>,
+    private val welcomeTextView: TextView
+    ) :
     ArrayAdapter<String>(context, R.layout.user_item, messages) {
 
     private val currentMessages = ArrayList<String>()
@@ -344,7 +378,6 @@ class ConversationAdapter(context: Context, private val messages: ArrayList<Stri
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
-                        // Do nothing, required to be overridden.
                     }
                 })
         }.addOnFailureListener { exception -> }
@@ -449,8 +482,6 @@ class UsernamesAdapter(context: Context, private val allUsernames: ArrayList<Str
 
         return view
     }
-
-
 
     private fun getImageUriFromBytes(bytes: ByteArray): Uri {
         val file = File.createTempFile("image", "jpg")

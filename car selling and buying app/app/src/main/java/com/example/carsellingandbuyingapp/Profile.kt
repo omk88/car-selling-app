@@ -2,6 +2,7 @@ package com.example.carsellingandbuyingapp
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.LightingColorFilter
 import android.graphics.drawable.BitmapDrawable
@@ -24,7 +25,9 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.ChildEventListener
@@ -35,6 +38,7 @@ import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.io.File
 
 
 class Profile : AppCompatActivity() {
@@ -121,84 +125,87 @@ class Profile : AppCompatActivity() {
             }
         }
 
+        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
+        fadeInAnim.duration = 100
+
         val banner = findViewById<ImageView>(R.id.banner)
         val profilePicture = findViewById<ImageView>(R.id.profilePicture)
 
-        val bannerUri = loggedInUser.bannerUri
-        val profilePictureUri = loggedInUser.profilePictureUri
+        var bannerUri = ""
+        var profilePictureUri = ""
 
-        val bannerImageUri = Uri.parse(bannerUri)
+        if (loggedInUser.username != userText.text.toString()) {
+            val messageAndCall = findViewById<LinearLayout>(R.id.messageAndCall)
+            messageAndCall.visibility = View.VISIBLE
 
-        val fadeInAnim = AlphaAnimation(0.0f, 1.0f)
-        fadeInAnim.duration = 500
+            val callSellerButton = findViewById<LinearLayout>(R.id.callSeller)
+            val messageSellerButton = findViewById<LinearLayout>(R.id.messageSeller)
 
-        Glide.with(this)
-            .load(bannerImageUri)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    shimmerContainer1.stopShimmer()
-                    shimmerContainer1.visibility = View.GONE
-                    return false
+            messageSellerButton.setOnClickListener {
+                val user = userText.text.toString()
+                val intent = Intent(this@Profile, Conversation::class.java)
+                intent.putExtra("user", user)
+                startActivity(intent)
+                overridePendingTransition(
+                    androidx.appcompat.R.anim.abc_fade_in,
+                    androidx.appcompat.R.anim.abc_fade_out
+                )
+            }
+
+            callSellerButton.setOnClickListener {
+                val database = Firebase.database.getReference("users")
+                database.child(userText.text.toString()).get().addOnSuccessListener {
+                    if (it.exists()) {
+                        val phoneNumber = it.child("phone").value.toString()
+                        val intent = Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$phoneNumber")
+                        }
+
+                        if (intent.resolveActivity(packageManager) != null) {
+                            startActivity(intent)
+                        }
+                    }
                 }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    shimmerContainer1.stopShimmer()
-                    shimmerContainer1.visibility = View.GONE
-                    banner.startAnimation(fadeInAnim)
-                    return false
-                }
-            })
-            .error(R.drawable.banner)
-            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-            .thumbnail(0.1f)
-            .into(banner)
+            }
+        }
 
 
-        val profilePictureImageUri = Uri.parse(profilePictureUri)
+        val profilePictureRef = Firebase.storage.reference.child("images/profile_picture-" + userText.text.toString())
+        val bannerPictureRef = Firebase.storage.reference.child("images/banner-" + userText.text.toString())
 
-        Glide.with(this)
-            .load(profilePictureImageUri)
-            .listener(object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    shimmerContainer2.stopShimmer()
-                    shimmerContainer2.visibility = View.GONE
-                    return false
-                }
+        profilePictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            val profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(this)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.profile_picture)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.1f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        profilePicture.setImageBitmap(resource)
+                        profilePicture.startAnimation(fadeInAnim)
+                    }
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    shimmerContainer2.stopShimmer()
-                    shimmerContainer2.visibility = View.GONE
-                    profilePicture.startAnimation(fadeInAnim)
-                    return false
-                }
-            })
-            .error(R.drawable.profile_picture)
-            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-            .thumbnail(0.1f)
-            .into(profilePicture)
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
 
+        bannerPictureRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
+            val profilePictureUri = getImageUriFromBytes(bytes)
+            Glide.with(this)
+                .asBitmap()
+                .load(profilePictureUri)
+                .error(R.drawable.banner)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .thumbnail(0.1f)
+                .into(object : CustomTarget<Bitmap?>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                        banner.setImageBitmap(resource)
+                        banner.startAnimation(fadeInAnim)
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {} })
+        }.addOnFailureListener { exception -> }
 
         val editButton = findViewById<ImageView>(R.id.editButton)
         editButton.visibility = View.INVISIBLE
@@ -478,6 +485,12 @@ class Profile : AppCompatActivity() {
         if (firstChildView != null) {
             firstChildView.setPadding(0, 100, 0, 0)
         }
+    }
+
+    private fun getImageUriFromBytes(bytes: ByteArray): Uri {
+        val file = File.createTempFile("image", "jpg")
+        file.writeBytes(bytes)
+        return Uri.fromFile(file)
     }
 
     private fun startConfettiEffect(konfettiView: nl.dionsegijn.konfetti.KonfettiView) {

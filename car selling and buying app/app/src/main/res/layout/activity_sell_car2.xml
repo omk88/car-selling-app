@@ -358,13 +358,13 @@
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/textView8"
+                        android:id="@+id/errorMessage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
                         android:padding="9dp"
-                        android:text="*File format: PNG, JPEG."
-                        android:textColor="#848884"
+                        android:text="One or more of the images you uploaded is not a car! Try uploading another image."
+                        android:textColor="#FF0000"
                         android:textSize="14sp" />
 
                 </LinearLayout>
