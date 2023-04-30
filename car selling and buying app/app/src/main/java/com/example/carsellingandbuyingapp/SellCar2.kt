@@ -208,7 +208,7 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
 
             val recommendPrice = findViewById<TextView>(R.id.recommendPrice)
 
-            recommendPrice.text = "Recommended Price: "+ outputArray[0].toString()
+            recommendPrice.text = "£"+ outputArray[0].toInt().toString()
 
 
 
@@ -660,10 +660,10 @@ class SellCar2 : AppCompatActivity(), View.OnClickListener {
 
                 var priceType = ""
 
-                val priceRatio = predictedPrice / price.substring(1).toInt()
+                val priceRatio = price.substring(1).toInt().toDouble() / predictedPrice
 
-                val greatPriceUpperBound = 0.95
-                val goodPriceUpperBound = 1
+                val greatPriceUpperBound = 1.0
+                val goodPriceUpperBound = 1.05
                 val fairPriceUpperBound = 1.15
 
                 priceType = when {

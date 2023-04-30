@@ -88,12 +88,32 @@ class ItemAdapter(context: Context, private val items: List<Item>) :
 
         if (item.priceType == "Great Price") {
             viewHolder.greatPrice.visibility = View.VISIBLE
+
+            viewHolder.goodPrice.visibility = View.GONE
+            viewHolder.badPrice.visibility = View.GONE
+            viewHolder.fairPrice.visibility = View.GONE
+
         } else if (item.priceType == "Good Price") {
             viewHolder.goodPrice.visibility = View.VISIBLE
+
+            viewHolder.greatPrice.visibility = View.GONE
+            viewHolder.badPrice.visibility = View.GONE
+            viewHolder.fairPrice.visibility = View.GONE
+
+
         } else if (item.priceType == "Fair Price") {
             viewHolder.fairPrice.visibility = View.VISIBLE
+
+            viewHolder.goodPrice.visibility = View.GONE
+            viewHolder.greatPrice.visibility = View.GONE
+            viewHolder.badPrice.visibility = View.GONE
+
         } else if (item.priceType == "Bad Price") {
             viewHolder.badPrice.visibility = View.VISIBLE
+
+            viewHolder.fairPrice.visibility = View.GONE
+            viewHolder.goodPrice.visibility = View.GONE
+            viewHolder.greatPrice.visibility = View.GONE
         }
 
 

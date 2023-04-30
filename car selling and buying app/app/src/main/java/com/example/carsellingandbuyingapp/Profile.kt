@@ -383,7 +383,6 @@ class Profile : AppCompatActivity() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Handle error
             }
         }
         userRef.child("sales").addValueEventListener(salesListener)

@@ -211,15 +211,13 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
             }
         }
 
-        // Wait for all uploads to complete
         val allUploadsSuccessful = withContext(Dispatchers.Default) {
             uploadResults.all { it }
         }
 
-        pd.dismiss() // Dismiss the progress dialog
+        pd.dismiss()
 
         if (allUploadsSuccessful) {
-            // Handle successful uploads
             val loggedInUser = application as Username
             loggedInUser.profilePictureUri = profilePictureUri.toString()
             loggedInUser.bannerUri = bannerUri.toString()
@@ -236,7 +234,6 @@ class EditProfile : AppCompatActivity(), View.OnClickListener {
             setResult(Activity.RESULT_OK)
             finish()
         } else {
-            // Handle failed uploads
             Toast.makeText(this@EditProfile, "Failed to save details.", Toast.LENGTH_SHORT).show()
         }
     }

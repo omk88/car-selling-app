@@ -3,9 +3,7 @@ package com.example.carsellingandbuyingapp
 import kotlin.math.sqrt
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -14,31 +12,22 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.*
 import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.File
-import java.io.FileInputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.MappedByteBuffer
-import java.nio.channels.FileChannel
 import java.util.*
 
 class MainPage : AppCompatActivity() {
+
+    private lateinit var inputPreferences: List<Pair<String, String>>
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_page)
-
-        main()
 
         var selectedMake = intent.getStringExtra("selected_make")
         var selectedModel = intent.getStringExtra("selected_model")
@@ -150,7 +139,24 @@ class MainPage : AppCompatActivity() {
         }
 
         val database = Firebase.database.getReference("cars")
+
         val cars = mutableListOf<Item>()
+
+        val rankedCarBrandNamesIndexMap = mutableMapOf<String, Int>()
+
+        main(object : OnRankedCarBrandsReceived {
+            override fun onReceived(rankedCarBrands: List<Unit>) {
+                val rankedCarBrandNames = rankedCarBrands
+                rankedCarBrandNames.forEachIndexed { index, brand ->
+                    rankedCarBrandNamesIndexMap[brand.toString()] = index
+                }
+
+                println("RANKKED"+ "")
+            }
+        })
+
+
+
 
         var mListView = findViewById<ListView>(R.id.carList)
 
@@ -188,7 +194,7 @@ class MainPage : AppCompatActivity() {
 
                 val regex = Regex(",\\s*([a-zA-Z]+)\\s*[a-zA-Z]*\\s*\\d")
                 val matchResult = regex.find(snapshot.child("address").getValue().toString())
-                var address = "Unknown"
+                var address = ""
 
                 if (matchResult != null) {
                     address = matchResult.groups[1]?.value.toString()
@@ -227,10 +233,14 @@ class MainPage : AppCompatActivity() {
                                 && (selectedFuelType == null) && (selectedColour == null) && (selectedMinEmissions == null)
                                 && (selectedMaxEmissions == null)) {
                                 flag = true
-                                cars.add(item)
+
+                                val insertIndex = findCarInsertIndex(rankedCarBrandNamesIndexMap, cars, item)
+
+                                println("INDEXXX"+ insertIndex)
+
+                                cars.add(insertIndex, item)
                                 adapter.notifyDataSetChanged()
-                                val viewPosition = cars.size - 1
-                                adapter.applyFadeInAnimation(viewPosition)
+                                adapter.applyFadeInAnimation(insertIndex)
                             }
 
                             var makeFilter = false
@@ -278,7 +288,12 @@ class MainPage : AppCompatActivity() {
                                 (!emissionsFilter || (emissions.toInt() >= selectedMinEmissions?.toInt()?: 0 && emissions.toInt() <= selectedMaxEmissions?.toInt()?: 0)) &&
                                 (!colourFilter || (selectedColour == colour))) {
                                 flag = true
-                                cars.add(item)
+
+                                val insertIndex = findCarInsertIndex(rankedCarBrandNamesIndexMap, cars, item)
+
+                                println("INDEXXX"+ insertIndex)
+
+                                cars.add(insertIndex, item)
                                 adapter.notifyDataSetChanged()
                                 val viewPosition = cars.size - 1
                                 adapter.applyFadeInAnimation(viewPosition)
@@ -316,6 +331,8 @@ class MainPage : AppCompatActivity() {
         fadeInAnim.duration = 500
         view.startAnimation(fadeInAnim)
     }
+
+
 
     private fun getImageUriFromBytes(bytes: ByteArray): Uri {
         val file = File.createTempFile("image", "jpg")
@@ -375,7 +392,25 @@ class MainPage : AppCompatActivity() {
         }
     }
 
-    fun main() {
+    private fun findCarInsertIndex(rankedCarBrandNamesIndexMap: Map<String, Int>, cars: MutableList<Item>, car: Item): Int {
+        val carRank = rankedCarBrandNamesIndexMap[car.text2] ?: Int.MAX_VALUE
+        var insertIndex = 0
+
+        for (i in cars.indices) {
+            val otherCar = cars[i]
+            val otherCarRank = rankedCarBrandNamesIndexMap[otherCar.text2] ?: Int.MAX_VALUE
+            if (carRank < otherCarRank) {
+                break
+            }
+            insertIndex++
+        }
+
+        return insertIndex
+    }
+
+
+
+    fun main(callback: OnRankedCarBrandsReceived): Unit {
         val data = listOf(
             mapOf(
                 "Car Brand" to "Abarth",
@@ -1269,20 +1304,56 @@ class MainPage : AppCompatActivity() {
             )
         )
 
+        var rankedCarBrandNames = "".map {}
+
         val carBrands = convertToCarBrandList(data)
 
-        val inputPreferences = listOf(
-            Pair("Use", "Commuting"),
-            Pair("Price", "£50,000+"),
-            Pair("Eco", "Very Important"),
-            Pair("Body", "Coupe"),
-            Pair("Performance", "Very Important"),
-            Pair("Luxury", "Somewhat Important")
-        )
+        val database = Firebase.database.getReference("preferences")
 
-        val rankedCarBrands = predictCarBrands(inputPreferences, carBrands)
-        val rankedCarBrandNames = rankedCarBrands.map { it.name }
-        println("RANKED: $rankedCarBrandNames")
+        val loggedInUser = application as Username
+
+        val userPreferencesRef = database.child(loggedInUser.username)
+
+        val preferencesListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val userPreferencesData = dataSnapshot.getValue(object : GenericTypeIndicator<HashMap<String, Any>>() {})
+
+                    if (userPreferencesData != null) {
+
+                        val body = userPreferencesData["body"].toString()
+                        val eco = userPreferencesData["eco"].toString()
+                        val performance = userPreferencesData["performance"].toString()
+                        val price = userPreferencesData["price"].toString()
+                        val use = userPreferencesData["use"].toString()
+                        val luxury = userPreferencesData["luxury"].toString()
+
+                        inputPreferences = listOf(
+                            Pair("Use", use),
+                            Pair("Price", price),
+                            Pair("Eco", eco),
+                            Pair("Body", body),
+                            Pair("Performance", performance),
+                            Pair("Luxury", luxury)
+                        )
+
+                        val rankedCarBrands = predictCarBrands(inputPreferences, carBrands)
+                        rankedCarBrandNames = rankedCarBrands.map { it.name }
+                        callback.onReceived(rankedCarBrandNames)
+
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+
+        userPreferencesRef.addValueEventListener(preferencesListener)
+
+    }
+
+    interface OnRankedCarBrandsReceived {
+        fun onReceived(rankedCarBrands: List<Unit>)
     }
 
 }

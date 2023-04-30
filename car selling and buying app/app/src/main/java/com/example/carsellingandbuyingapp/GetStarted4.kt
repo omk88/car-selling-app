@@ -51,6 +51,10 @@ class GetStarted4 : AppCompatActivity() {
 
                 override fun onAnimationEnd(animation: Animation) {
                     container.visibility = View.GONE
+                    val use = intent.getStringExtra("Use")
+                    val seats = intent.getStringExtra("Seats")
+                    var price = ""
+
                     val intent = Intent(this@GetStarted4, GetStarted5::class.java)
 
                     val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
@@ -59,8 +63,12 @@ class GetStarted4 : AppCompatActivity() {
                     if (selectedRadioButtonId != -1) {
                         val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
                         val selectedValue = selectedRadioButton.text.toString()
-                        intent.putExtra("Price", selectedValue)
+                        price = selectedValue
                     } else { }
+
+                    intent.putExtra("Use", use)
+                    intent.putExtra("Seats", seats)
+                    intent.putExtra("Price", price)
                     intent.putExtra("progressButton", "next")
                     startActivity(intent)
                 }

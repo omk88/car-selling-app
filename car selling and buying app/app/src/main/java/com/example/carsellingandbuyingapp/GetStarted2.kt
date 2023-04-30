@@ -33,16 +33,6 @@ class GetStarted2 : AppCompatActivity() {
 
             val intent = Intent(this@GetStarted2, MainPage::class.java)
 
-            val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-            val selectedRadioButtonId = radioGroup.checkedRadioButtonId
-
-            if (selectedRadioButtonId != -1) {
-                val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
-                val selectedValue = selectedRadioButton.text.toString()
-                intent.putExtra("Use", selectedValue)
-            } else { }
-
-
             startActivity(intent)
             overridePendingTransition(androidx.appcompat.R.anim.abc_fade_in, androidx.appcompat.R.anim.abc_fade_out)
         }
@@ -61,7 +51,20 @@ class GetStarted2 : AppCompatActivity() {
 
                 override fun onAnimationEnd(animation: Animation) {
                     container.visibility = View.GONE
+                    var use = ""
                     val intent = Intent(this@GetStarted2, GetStarted3::class.java)
+
+                    val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+                    val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+
+                    if (selectedRadioButtonId != -1) {
+                        val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                        val selectedValue = selectedRadioButton.text.toString()
+                        use = selectedValue
+                    } else { }
+
+
+                    intent.putExtra("Use", use)
                     intent.putExtra("progressButton", "next")
                     startActivity(intent)
                 }

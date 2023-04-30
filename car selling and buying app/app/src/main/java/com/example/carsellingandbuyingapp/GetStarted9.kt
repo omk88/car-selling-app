@@ -6,18 +6,31 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class GetStarted9 : AppCompatActivity() {
+
+    private var resale: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_get_started9)
+
+        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+        val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+
+        if (selectedRadioButtonId != -1) {
+            val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+            val selectedValue = selectedRadioButton.text.toString()
+            resale = selectedValue
+            println("RESALE"+ resale)
+
+
+        } else { }
 
         var prev = findViewById<LinearLayout>(R.id.prevLayout)
 
@@ -52,7 +65,6 @@ class GetStarted9 : AppCompatActivity() {
         }
 
         completePreferences()
-
         continue1.setOnClickListener {
             val intent = Intent(this@GetStarted9, MainPage::class.java)
             startActivity(intent)
@@ -61,7 +73,24 @@ class GetStarted9 : AppCompatActivity() {
     }
 
     fun completePreferences() {
+
         val loggedInUser = application as Username
+        val databasePreferences = Firebase.database.getReference("preferences")
+
+        databasePreferences.child(loggedInUser.username).get().addOnSuccessListener {
+            val use = intent.getStringExtra("Use")
+            val seats = intent.getStringExtra("Seats")
+            val price = intent.getStringExtra("Price")
+            val eco = intent.getStringExtra("Eco")
+            val body = intent.getStringExtra("Body")
+            val performance = intent.getStringExtra("Performance")
+
+
+
+            val preferences = Preferences(use, seats, price, eco, body, performance, "Not Important")
+            databasePreferences.child(loggedInUser.username).setValue(preferences)
+        }
+
         val database = Firebase.database.getReference("users")
         database.child(loggedInUser.username).get().addOnSuccessListener {
             if(it.exists()) {
