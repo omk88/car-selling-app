@@ -372,7 +372,7 @@ class MainPage : AppCompatActivity() {
         val similarities = carBrands.map { carBrand ->
             val carBrandVector = listOf(carBrand.use, carBrand.price, carBrand.body, carBrand.eco, carBrand.performance, carBrand.luxury, carBrand.resale)
             val similarity = cosineSimilarity(inputVector, carBrandVector)
-            carBrand.copy(name = carBrand.name, use = similarity) // Using 'use' field to store similarity, you can create another field if needed
+            carBrand.copy(name = carBrand.name, use = similarity)
         }
         return similarities.sortedByDescending { it.use }
     }
