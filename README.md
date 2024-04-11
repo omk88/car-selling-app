@@ -8,6 +8,16 @@
 
 AutoXchange is a car buying and selling app for android that I made for the final project for my computer science degree. The user can list cars for sale, view and search for current cars for sale, collect badges from selling cars to display on their profile and communicate with other users on the platform. There is a login system that stores users credentials using Firebase and machine learning is used throughout the app to determine what cars the user sees, prevent the user from listing things which are not cars, and to judge whether cars have been listed for a good price.
 
+## Built With
+
+- Android Studio
+
+- Kotlin
+
+- XML
+
+- Firebase
+
 
 
 
