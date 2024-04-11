@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/omk88/car-selling-app/assets/46501575/5b3d0ab1-4109-46bd-8bda-bc4dfd4d9dad">
+  <img src="https://github.com/omk88/car-selling-app/assets/46501575/5b3d0ab1-4109-46bd-8bda-bc4dfd4d9dad" height=100, width=100>
 </p>
 
 <h2 align="center" >
