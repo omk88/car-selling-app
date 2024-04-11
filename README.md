@@ -48,6 +48,7 @@ AutoXchange is a car buying and selling app for android that I made for the fina
 
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/8ded8aa2-39cb-4d31-95ff-3d38e95494d5 width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/edf5a16d-37e7-4887-84e4-bacc5f378cbc width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/38053b1e-d83b-4f91-8414-a8186769b49c width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/e9f7cc87-a2a4-49bc-bd5e-30fb80d7fb90 width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/6780e2a6-b898-4568-9606-bf289b8f1cf3 width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/d5e0892e-aa87-45d1-a295-69641c79c9b6 width="240" height="474">
@@ -55,7 +56,4 @@ AutoXchange is a car buying and selling app for android that I made for the fina
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/d97d9f46-cebf-42fe-9ef7-4cf9e6efff8c width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/053a4e9e-b73b-42d6-a0e8-3eff9b80ecfb width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/053a4e9e-b73b-42d6-a0e8-3eff9b80ecfb width="240" height="474">
-<img src=https://github.com/omk88/car-selling-app/assets/46501575/053a4e9e-b73b-42d6-a0e8-3eff9b80ecfb width="240" height="474">
-
-
 
