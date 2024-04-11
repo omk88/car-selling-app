@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="https://github.com/omk88/car-selling-app/assets/46501575/5b3d0ab1-4109-46bd-8bda-bc4dfd4d9dad">
+</p>
+
+<h2 align="center" >
+  <b>AutoXchange</b>
+</h2>
+
+
+
+
 # car-selling-app
 Car selling app for end of year project
 ![Screenshot_20230315-002549_Car Selling and Buying App](https://user-images.githubusercontent.com/46501575/225172063-935360ca-09e7-42c6-8f97-c26a91145799.jpg)
