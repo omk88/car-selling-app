@@ -18,6 +18,32 @@ AutoXchange is a car buying and selling app for android that I made for the fina
 
 - Firebase
 
+- Tensorflow
 
+## Features
+
+- Sign up/sign in system that stores user credentials in Firebase.
+
+- Navigation bar to move through the different pages.
+
+- Page to browse through the currently listed cars.
+
+- Search feature to sort through cars based on various criteria (make, model, colour, mileage, etc).
+
+- Page to list new cars that uses Tensorflow to evaluate the images the user has uploaded to prevent images that are not cars from being used. The information the user gives is stored in Firebase.
+
+- Page to view a map with points where each car is.
+
+- Preferences opening sequence to determine the order of cars they could be interested in.
+
+- Profile page to store badges they have collected, display their profile picture and banner.
+
+- Awards system that gives badges to users upon selling certain quantities of cars.
+
+- Ability to customise their profile picture and banner.
+
+- Ability to message other users within the app and send them pictures too.
+
+## Screenshots
 
 
