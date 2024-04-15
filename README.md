@@ -66,7 +66,7 @@ AutoXchange is a car buying and selling app for android that I made for the fina
 
 
 
-<img src=https://github.com/omk88/car-selling-app/assets/46501575/2408045d-79a4-4f8a-af1b-d6ffd5727e79 width="240" height="930">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/2408045d-79a4-4f8a-af1b-d6ffd5727e79 width="240" height="920">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/9f0024c1-209e-4c0c-a19f-3c44397f36d2 width="240" height="474">
 
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/96e7f704-e186-458f-b102-d8f21284b2b8 width="240" height="474">
