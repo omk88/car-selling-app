@@ -69,25 +69,25 @@ AutoXchange is a car buying and selling app for android that I made for the fina
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/2408045d-79a4-4f8a-af1b-d6ffd5727e79 width="240" height="474">
 <img src=https://github.com/omk88/car-selling-app/assets/46501575/9f0024c1-209e-4c0c-a19f-3c44397f36d2 width="240" height="474">
 
-![Screenshot_20230501-181516_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/96e7f704-e186-458f-b102-d8f21284b2b8)
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/96e7f704-e186-458f-b102-d8f21284b2b8 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/f0adc147-d89b-45d7-b5ee-f75856e90ef2 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/077ec954-76fc-44ac-b75b-16c3e97127ac width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/63ea4627-3bf1-421d-84c6-585e467f247b width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/66f01ed3-5383-4afd-9be0-c46648a46382 width="240" height="474">
 
-![Screenshot_20230501-013858_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/f0adc147-d89b-45d7-b5ee-f75856e90ef2)
-![Screenshot_20230501-013903_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/077ec954-76fc-44ac-b75b-16c3e97127ac)
-![Screenshot_20230501-013914_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/63ea4627-3bf1-421d-84c6-585e467f247b)
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/254c5c7c-c52d-4a57-9e2a-4aa7ab9b0464 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/39afd484-759d-4804-91bc-e4194345d0d0 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/b59ed0c8-3d39-453e-863e-4585401f62f4 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/3dadfcb5-df7b-4f2a-abe0-2a5d9ae59b96 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/bc178932-01ed-4eb1-9c12-060e972011f0 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/3093125e-006d-46b2-a6ba-fb80b64ce38b width="240" height="474">
 
-![Screenshot_20230501-013244_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/66f01ed3-5383-4afd-9be0-c46648a46382)
-![Screenshot_20230501-013255_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/254c5c7c-c52d-4a57-9e2a-4aa7ab9b0464)
-![Screenshot_20230501-013746_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/39afd484-759d-4804-91bc-e4194345d0d0)
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/359cd91d-6394-4775-a1e5-b18725be28ac width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/df0eb6eb-64c5-4224-a024-9bf98f8dd97a width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/53870348-7c88-4696-84ff-327cf5931846 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/91ddf746-2ee8-4763-8fbd-60803c122826 width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/65570a6a-bf3c-4f88-96e0-37f84ed2f0bf width="240" height="474">
+<img src=https://github.com/omk88/car-selling-app/assets/46501575/3093125e-006d-46b2-a6ba-fb80b64ce38b width="240" height="474">
 
-![Screenshot_20230501-121643_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/b59ed0c8-3d39-453e-863e-4585401f62f4)
-![Screenshot_20230501-121644_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/3dadfcb5-df7b-4f2a-abe0-2a5d9ae59b96)
-![Screenshot_20230501-121727_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/bc178932-01ed-4eb1-9c12-060e972011f0)
-![Screenshot_20230501-121748_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/3093125e-006d-46b2-a6ba-fb80b64ce38b)
-![Screenshot_20230501-121804_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/359cd91d-6394-4775-a1e5-b18725be28ac)
-![Screenshot_20230501-121816_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/df0eb6eb-64c5-4224-a024-9bf98f8dd97a)
-![Screenshot_20230501-121825_Car Selling and Buying App](https://github.com/omk88/car-selling-app/assets/46501575/53870348-7c88-4696-84ff-327cf5931846)
-
-![Screenshot_20230501-170527_Car Selling and Buying App (1)](https://github.com/omk88/car-selling-app/assets/46501575/91ddf746-2ee8-4763-8fbd-60803c122826)
-![Screenshot_20230501-170615_Car Selling and Buying App (1)](https://github.com/omk88/car-selling-app/assets/46501575/65570a6a-bf3c-4f88-96e0-37f84ed2f0bf)
 
 
